@@ -11,3 +11,11 @@ Crie a sessão ## Conteúdo com links locais para o arquivo .github/skills/archi
 Crie no diretorio rais um app Android chamado Cinemateca apenas com a MainActivity. Deixe a activity em branco.
 
 Compile e execute o app  no device usando o adb
+
+Renomeie o pacote do app de com.example.cinemateca para com.cinemateca; Remova qualquer referencia a example do app
+
+Adicione o pacote da aplicação ao manifest
+
+A activity MainActivity está dando erro no manifest. Corrija
+
+$android-app-architecture adicione todas as dependencias listada na skill ao projeto
