@@ -17,7 +17,7 @@ modificação ou exclusão e identificar todas as camadas afetadas.
 ## Como selecionar as referências
 
 Carregar apenas as referências necessárias para a mudança. Ler
-[Visão geral da arquitetura](references/architecture-overview.md) antes de:
+[Visão geral da arquitetura](references/overview.md) antes de:
 
 - criar ou apagar uma feature, camada ou módulo;
 - mudar o fluxo de dependências entre camadas;
@@ -34,7 +34,7 @@ observável forem alterados.
 ### Visão geral da arquitetura
 
 Usar
-[references/architecture-overview.md](references/architecture-overview.md)
+[references/architecture-overview.md](references/overview.md)
 para validar limites, responsabilidades, módulos, stack e direção das
 dependências.
 
@@ -49,23 +49,39 @@ dependências.
 
 Usar [references/repository.md](references/repository.md) ao adicionar,
 modificar ou apagar contratos e implementações de Repository, fontes remotas,
-DTOs, mappers, conversão de respostas, tratamento de erros, analytics,
-injeção de dependências ou testes da camada de dados.
+DTOs, mappers, conversão de respostas, tratamento de erros, injeção de
+dependências ou testes da camada de dados.
 
 - Ao adicionar: seguir os pacotes, sufixos, contratos e fluxos documentados;
   instalar somente os assets exigidos pelo cenário; usar o scaffold da camada
   apenas para arquivos novos; registrar as dependências e criar testes.
 - Ao modificar: inspecionar o contrato, a implementação, os mappers, os
-  analytics, os módulos de DI e todos os UseCases consumidores. Não regenerar
-  nem sobrescrever arquivos existentes.
+  módulos de DI e todos os UseCases consumidores. Não regenerar nem
+  sobrescrever arquivos existentes.
 - Ao apagar: localizar usos do contrato e da implementação; remover somente
-  após tratar UseCases consumidores, registros de DI, DTOs, mappers,
-  analytics e testes que tenham se tornado exclusivamente órfãos.
+  após tratar UseCases consumidores, registros de DI, DTOs, mappers e testes
+  que tenham se tornado exclusivamente órfãos.
 
 Se o tipo de retorno, modelo de domínio ou erro observável mudar, ler também
 [UseCase](references/use-case.md),
 [ViewModel](references/view-model.md) e [View](references/view.md) até a última
 camada afetada.
+
+### Analytics
+
+Usar [assets/repository/analytics.md](assets/repository/analytics.md) ao
+adicionar, modificar ou apagar contratos, eventos, identificações, managers,
+trackers, provedores, injeção de dependências ou testes de Analytics.
+
+- Ao adicionar: instalar em conjunto os assets exigidos, preservar o módulo
+  próprio e expor às features somente `AppAnalytics` e os modelos de eventos e
+  identificação.
+- Ao modificar: inspecionar o contrato público, todos os trackers, a seleção por
+  tipo de build, a DI e as features consumidoras. Manter falhas isoladas do
+  fluxo funcional.
+- Ao apagar: localizar os usos nas features e remover somente após tratar
+  eventos, bindings, trackers, dependências e testes que tenham se tornado
+  exclusivamente órfãos.
 
 ### UseCase
 
@@ -134,7 +150,7 @@ referência. Não criar testes instrumentados para cumprir suas verificações.
 
 Não usar essa referência isoladamente. Ler sempre:
 
-1. a [visão geral](references/architecture-overview.md);
+1. a [visão geral](references/overview.md);
 2. a referência de cada camada coberta pelo teste;
 3. os assets e scripts indicados por essas referências quando o teste validar
    classes reutilizáveis ou código gerado.
@@ -156,6 +172,7 @@ Usar esta ordem para rastrear consumidores:
 | Camada alterada | Inspeção mínima obrigatória |
 | --- | --- |
 | Repository | UseCases, DI e testes; ViewModels e Views se o resultado observável mudar; testes arquiteturais de Repository e assets |
+| Analytics | Features consumidoras, DI, seleção de trackers por build e testes; assets e dependências de provedores |
 | UseCase | ViewModels consumidores, DI e testes; Views se estado ou comportamento mudar; testes arquiteturais de domínio |
 | ViewModel | Destinations, Screens, DI e testes; testes arquiteturais de apresentação |
 | View ou navegação | Rotas, `NavHost`, componentes e testes de UI; ViewModel se o contrato da UI mudar; testes arquiteturais de Compose e navegação |
@@ -207,6 +224,7 @@ usos.
 
 - Tratar os inventários e as condições de uso descritos em
   [Repository](references/repository.md) e
+  [Analytics](assets/repository/analytics.md) e
   [UseCase](references/use-case.md) como fonte de verdade para todos os
   arquivos em `assets/`.
 - Não copiar assets indiscriminadamente; instalar apenas os exigidos pela

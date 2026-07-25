@@ -33,7 +33,7 @@ comportamental ou revisão explícita, nunca como regra implicitamente ignorada.
 
 Ler as fontes nesta ordem:
 
-1. [architecture-overview.md](architecture-overview.md) para camadas, direção
+1. [architecture-overview.md](overview.md) para camadas, direção
    das dependências e stack.
 2. [repository.md](repository.md), [use-case.md](use-case.md),
    [view-model.md](view-model.md) e [view.md](view.md) conforme as camadas
