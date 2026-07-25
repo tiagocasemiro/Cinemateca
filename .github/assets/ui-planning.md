@@ -55,5 +55,3 @@ O app deve ter:
     - idioma do conteudo
     - link pro youtube
   - (TELA) uma tela de recomendações relacionadas
-
-  Caso consiga acessar o conteudo desta url: https://dribbble.com/shots/6575546-Cinema-Booking-Ticket-Mobile-App, use como base este app
