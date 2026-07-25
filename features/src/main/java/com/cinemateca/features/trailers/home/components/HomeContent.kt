@@ -28,12 +28,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -128,7 +130,7 @@ internal fun HomeHeader(
 
 @Composable
 internal fun HomeFilters(
-    movieCount: Int,
+    movieCount: Int?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -173,7 +175,9 @@ internal fun HomeFilters(
                 ),
         ) {
             Text(
-                text = "$movieCount ${if (movieCount == 1) "filme" else "filmes"}",
+                text = movieCount?.let {
+                    "$it ${if (it == 1) "filme" else "filmes"}"
+                } ?: "—",
                 color = CinematecaColors.TertiaryText,
                 fontSize = 11.sp,
                 lineHeight = 17.sp,
@@ -209,6 +213,95 @@ internal fun HomeFilters(
             thickness = 1.dp,
         )
     }
+}
+
+@Composable
+internal fun HomeLoadingContent(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        userScrollEnabled = false,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .semantics {
+                contentDescription = "Carregando filmes"
+            }
+            .testTag("home_loading"),
+    ) {
+        items(
+            count = 4,
+            key = { index -> index },
+        ) {
+            SkeletonMovieCard()
+        }
+    }
+}
+
+@Composable
+private fun SkeletonMovieCard(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        color = CinematecaColors.Surface,
+        shape = CardShape,
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color.White.copy(alpha = 0.05f),
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(164.dp)
+            .graphicsLayer {
+                alpha = 0.71f
+            },
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(15.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(95.dp)
+                    .height(133.dp)
+                    .clip(PosterShape)
+                    .background(Color.White.copy(alpha = 0.1f)),
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(9.5.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 5.dp),
+            ) {
+                SkeletonLine(
+                    widthFraction = 0.75f,
+                    height = 19.dp,
+                )
+                SkeletonLine(widthFraction = 0.5f)
+                SkeletonLine(widthFraction = 0.67f)
+                Spacer(modifier = Modifier.height(0.75.dp))
+                SkeletonLine(widthFraction = 1f)
+                SkeletonLine(widthFraction = 0.8f)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SkeletonLine(
+    widthFraction: Float,
+    modifier: Modifier = Modifier,
+    height: androidx.compose.ui.unit.Dp = 14.dp,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth(widthFraction)
+            .height(height)
+            .clip(RoundedCornerShape(5.dp))
+            .background(Color.White.copy(alpha = 0.1f)),
+    )
 }
 
 @Composable

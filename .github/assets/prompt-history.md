@@ -39,3 +39,5 @@ Crie os usecases para disponibilisar para as view model todos os dados recebidos
 $android-app-architecture Implemente a view model da home consumindo a listagem o usecase de trending. Deixe a viewmodel preparada para receber a tela com jetpack compose
 
 implemente o layout da tela de home, use o mcp do figma para ler o layout da url: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=1-411&t=h9eFD3oIOp74GJK6-4
+
+Atualize o estado de loading esse layout https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=2-8&t=h9eFD3oIOp74GJK6-4

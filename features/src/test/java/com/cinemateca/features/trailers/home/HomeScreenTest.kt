@@ -2,6 +2,7 @@ package com.cinemateca.features.trailers.home
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.cinemateca.features.designsystem.CinematecaTheme
@@ -55,6 +56,23 @@ class HomeScreenTest {
         composeRule.onNodeWithText("Tentar novamente").performClick()
 
         assertEquals(listOf(HomeUiAction.Retry), actions)
+    }
+
+    @Test
+    fun `renders Figma skeletons while initial data is loading`() {
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isLoading = true),
+                    onAction = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("—").assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Carregando filmes")
+            .assertIsDisplayed()
     }
 
     private fun trailer() = HomeTrailerItemUiModel(

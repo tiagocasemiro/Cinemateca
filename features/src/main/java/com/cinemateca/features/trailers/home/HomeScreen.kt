@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import com.cinemateca.features.trailers.home.components.HomeContent
 import com.cinemateca.features.trailers.home.components.HomeErrorContent
 import com.cinemateca.features.trailers.home.components.HomeFilters
 import com.cinemateca.features.trailers.home.components.HomeHeader
+import com.cinemateca.features.trailers.home.components.HomeLoadingContent
 
 @Composable
 fun HomeScreen(
@@ -37,7 +37,11 @@ fun HomeScreen(
             .navigationBarsPadding(),
     ) {
         HomeHeader()
-        HomeFilters(movieCount = uiState.trailers.size)
+        HomeFilters(
+            movieCount = uiState.trailers.size.takeUnless {
+                uiState.isLoading && uiState.trailers.isEmpty()
+            },
+        )
 
         Box(
             modifier = Modifier
@@ -52,10 +56,7 @@ fun HomeScreen(
                     onWatchClick = onWatchClick,
                 )
 
-                uiState.isLoading -> CircularProgressIndicator(
-                    color = CinematecaColors.Primary,
-                    modifier = Modifier.align(Alignment.Center),
-                )
+                uiState.isLoading -> HomeLoadingContent()
 
                 uiState.errorMessage != null -> HomeErrorContent(
                     message = uiState.errorMessage,
