@@ -19,3 +19,17 @@ Adicione o pacote da aplicação ao manifest
 A activity MainActivity está dando erro no manifest. Corrija
 
 $android-app-architecture adicione todas as dependencias listada na skill ao projeto
+
+Crie a camada de repository
+
+Integre o app Android Cinemateca com estes endpoints da KinoCheck:
+
+GET /trailers/trending — filmes e trailers em alta.
+GET /trailers/latest — lançamentos e trailers recentes.
+GET /trailers — filtros por gênero, categoria e idioma.
+GET /movies?id={id} — detalhes, trailer, vídeos oficiais e recomendações.
+
+Também permita buscar detalhes usando:
+
+tmdb_id
+imdb_id
