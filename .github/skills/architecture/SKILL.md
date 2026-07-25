@@ -69,7 +69,7 @@ camada afetada.
 
 ### Analytics
 
-Usar [assets/repository/analytics.md](assets/repository/analytics.md) ao
+Usar [references/analytics.md](references/analytics.md) ao
 adicionar, modificar ou apagar contratos, eventos, identificações, managers,
 trackers, provedores, injeção de dependências ou testes de Analytics.
 
@@ -224,7 +224,7 @@ usos.
 
 - Tratar os inventários e as condições de uso descritos em
   [Repository](references/repository.md) e
-  [Analytics](assets/repository/analytics.md) e
+  [Analytics](references/analytics.md) e
   [UseCase](references/use-case.md) como fonte de verdade para todos os
   arquivos em `assets/`.
 - Não copiar assets indiscriminadamente; instalar apenas os exigidos pela
