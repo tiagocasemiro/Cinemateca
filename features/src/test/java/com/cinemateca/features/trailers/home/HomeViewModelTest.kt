@@ -54,7 +54,18 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
-        assertEquals(listOf(trailer()), viewModel.uiState.value.trailers)
+        assertEquals(
+            listOf(
+                HomeTrailerItemUiModel(
+                    id = "trailer-1",
+                    title = "Trailer em alta",
+                    thumbnailUrl = "https://cdn.kinocheck.com/1.jpg",
+                    genres = "Action",
+                    published = "25 jul. 2026",
+                ),
+            ),
+            viewModel.uiState.value.trailers,
+        )
         assertNull(viewModel.uiState.value.errorMessage)
     }
 
@@ -74,7 +85,7 @@ class HomeViewModelTest {
         viewModel.onAction(HomeUiAction.Retry)
         advanceUntilIdle()
 
-        assertEquals(listOf(trailer()), viewModel.uiState.value.trailers)
+        assertEquals("trailer-1", viewModel.uiState.value.trailers.single().id)
         assertNull(viewModel.uiState.value.errorMessage)
         coVerify(exactly = 2) { getTrendingTrailersUseCase(any()) }
     }

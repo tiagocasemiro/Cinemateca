@@ -5,7 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Loading
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +53,11 @@ class HomeViewModel(
             try {
                 when (val result = getTrendingTrailersUseCase()) {
                     is Success -> mutableUiState.update {
-                        it.copy(trailers = result.data.trailers)
+                        it.copy(
+                            trailers = result.data.trailers.map(
+                                Trailer::toUiModel,
+                            ),
+                        )
                     }
 
                     is Failure -> mutableUiState.update {
@@ -81,4 +89,28 @@ class HomeViewModel(
         const val DEFAULT_ERROR_MESSAGE =
             "Não foi possível carregar os trailers em alta."
     }
+}
+
+private fun Trailer.toUiModel() = HomeTrailerItemUiModel(
+    id = id,
+    title = title,
+    thumbnailUrl = thumbnail ?: youtubeThumbnail,
+    genres = genres
+        .ifEmpty { categories }
+        .joinToString(separator = " / ")
+        .ifBlank { "Gênero não informado" },
+    published = published.toDisplayDate(),
+)
+
+private fun String?.toDisplayDate(): String {
+    if (isNullOrBlank()) return "Data não informada"
+
+    return runCatching {
+        OffsetDateTime.parse(this).format(
+            DateTimeFormatter.ofPattern(
+                "dd MMM uuuu",
+                Locale.forLanguageTag("pt-BR"),
+            ),
+        )
+    }.getOrDefault(this)
 }

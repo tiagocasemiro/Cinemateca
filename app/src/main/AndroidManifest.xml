@@ -7,7 +7,7 @@
     <application
         android:name=".CinematecaApplication"
         android:label="Cinemateca"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
             android:name="com.cinemateca.MainActivity"
             android:exported="true">

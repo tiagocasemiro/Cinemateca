@@ -1,9 +1,15 @@
 package com.cinemateca.features.trailers.home
 
-import com.cinemateca.domain.trailers.model.Trailer
-
 data class HomeUiState(
     val isLoading: Boolean = false,
-    val trailers: List<Trailer> = emptyList(),
+    val trailers: List<HomeTrailerItemUiModel> = emptyList(),
     val errorMessage: String? = null,
+)
+
+data class HomeTrailerItemUiModel(
+    val id: String,
+    val title: String,
+    val thumbnailUrl: String?,
+    val genres: String,
+    val published: String,
 )
