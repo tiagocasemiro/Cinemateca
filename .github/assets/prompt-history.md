@@ -33,3 +33,7 @@ Também permita buscar detalhes usando:
 
 tmdb_id
 imdb_id
+
+Crie os usecases para disponibilisar para as view model todos os dados recebidos por repository
+
+$android-app-architecture Implemente a view model da home consumindo a listagem o usecase de trending. Deixe a viewmodel preparada para receber a tela com jetpack compose
