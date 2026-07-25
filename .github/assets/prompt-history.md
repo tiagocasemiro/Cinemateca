@@ -7,3 +7,7 @@ Extraia todas as definições de analytcs do arquivo .github/skills/architecture
 mova o arquivo .github/skills/architecture/assets/repository/analytics.md para o diretorio .github/skills/architecture/references
 
 Crie a sessão ## Conteúdo com links locais para o arquivo .github/skills/architecture/references/repository.md
+
+Crie no diretorio rais um app Android chamado Cinemateca apenas com a MainActivity. Deixe a activity em branco.
+
+Compile e execute o app  no device usando o adb

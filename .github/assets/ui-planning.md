@@ -39,9 +39,7 @@ Trailers em alta
 
 ## pronp de design:
 
-Crie um app que simples que liste os filmes próximos a entrar em cartas ou ja em cartas.
-
-O app deve ter:
+Crie um app Android simples, com nome Cinemateca que liste os filmes próximos ou já em cartas nos cinemas.
 
 - (TELA) uma tela principal com uma listagem de filmes,
   - Filtro da lista com lançamentos
