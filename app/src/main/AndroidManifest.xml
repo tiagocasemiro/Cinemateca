@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cinemateca">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".CinematecaApplication"
         android:label="Cinemateca"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity

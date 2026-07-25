@@ -43,6 +43,9 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     val firebaseBom = platform("com.google.firebase:firebase-bom:33.2.0")
 
+    implementation(project(":domain"))
+    implementation(project(":networking"))
+
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-compose:1.9.0")
 
