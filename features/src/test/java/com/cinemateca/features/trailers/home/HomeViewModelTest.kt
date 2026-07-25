@@ -4,6 +4,8 @@ import com.cinemateca.domain.Error
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Result
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.connectivity.repository.InternetConnectionRepository
+import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
 import com.cinemateca.domain.trailers.model.PageMetadata
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.model.TrailerPage
@@ -13,6 +15,8 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -29,12 +33,19 @@ class HomeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val getTrendingTrailersUseCase = mockk<GetTrendingTrailersUseCase>()
+    private val internetAvailability = MutableStateFlow(true)
+    private val observeInternetConnectionUseCase =
+        ObserveInternetConnectionUseCase(
+            repository = FakeInternetConnectionRepository(
+                availability = internetAvailability,
+            ),
+        )
 
     @Test
     fun `starts with a complete renderable state`() {
         coEvery { getTrendingTrailersUseCase(any()) } returns Success(trailerPage())
 
-        val viewModel = HomeViewModel(getTrendingTrailersUseCase)
+        val viewModel = createViewModel()
 
         assertEquals(HomeUiState(), viewModel.uiState.value)
     }
@@ -43,7 +54,7 @@ class HomeViewModelTest {
     fun `loads trending trailers during initialization`() = runTest {
         val pendingResult = CompletableDeferred<Result<TrailerPage>>()
         coEvery { getTrendingTrailersUseCase(any()) } coAnswers { pendingResult.await() }
-        val viewModel = HomeViewModel(getTrendingTrailersUseCase)
+        val viewModel = createViewModel()
 
         runCurrent()
 
@@ -75,7 +86,7 @@ class HomeViewModelTest {
             Error(message = "Serviço indisponível"),
         )
         coEvery { getTrendingTrailersUseCase(any()) } coAnswers { result }
-        val viewModel = HomeViewModel(getTrendingTrailersUseCase)
+        val viewModel = createViewModel()
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
@@ -94,7 +105,7 @@ class HomeViewModelTest {
     fun `ignores refresh while a request is active`() = runTest {
         val pendingResult = CompletableDeferred<Result<TrailerPage>>()
         coEvery { getTrendingTrailersUseCase(any()) } coAnswers { pendingResult.await() }
-        val viewModel = HomeViewModel(getTrendingTrailersUseCase)
+        val viewModel = createViewModel()
         runCurrent()
 
         viewModel.onAction(HomeUiAction.Refresh)
@@ -104,6 +115,46 @@ class HomeViewModelTest {
         pendingResult.complete(Success(trailerPage()))
         advanceUntilIdle()
     }
+
+    @Test
+    fun `shows offline state without requesting trailers when app opens offline`() =
+        runTest {
+            internetAvailability.value = false
+            val viewModel = createViewModel()
+
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.isOffline)
+            assertFalse(viewModel.uiState.value.isLoading)
+            assertNull(viewModel.uiState.value.errorMessage)
+            coVerify(exactly = 0) { getTrendingTrailersUseCase(any()) }
+        }
+
+    @Test
+    fun `detects internet loss and reloads after validated connection returns`() =
+        runTest {
+            coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+                trailerPage(),
+            )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            internetAvailability.value = false
+            advanceUntilIdle()
+
+            assertTrue(viewModel.uiState.value.isOffline)
+
+            internetAvailability.value = true
+            advanceUntilIdle()
+
+            assertFalse(viewModel.uiState.value.isOffline)
+            coVerify(exactly = 2) { getTrendingTrailersUseCase(any()) }
+        }
+
+    private fun createViewModel() = HomeViewModel(
+        getTrendingTrailersUseCase = getTrendingTrailersUseCase,
+        observeInternetConnectionUseCase = observeInternetConnectionUseCase,
+    )
 
     private fun trailerPage() = TrailerPage(
         trailers = listOf(trailer()),
@@ -130,4 +181,10 @@ class HomeViewModelTest {
         views = 42,
         resource = null,
     )
+}
+
+private class FakeInternetConnectionRepository(
+    private val availability: Flow<Boolean>,
+) : InternetConnectionRepository.Local {
+    override fun observeAvailability(): Flow<Boolean> = availability
 }

@@ -4,8 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -560,6 +563,88 @@ internal fun HomeErrorContent(
             ),
         ) {
             Text(text = "Tentar novamente")
+        }
+    }
+}
+
+@Composable
+internal fun HomeOfflineContent(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val topPadding = if (maxHeight >= 360.dp) 76.dp else 0.dp
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(
+                    start = 29.dp,
+                    top = topPadding,
+                    end = 29.dp,
+                    bottom = 24.dp,
+                ),
+        ) {
+            Surface(
+                color = CinematecaColors.SurfaceElevated,
+                shape = PillShape,
+                modifier = Modifier
+                    .size(76.dp)
+                    .semantics {
+                        contentDescription = "Sem conexão com a internet"
+                    },
+            ) {
+                FigmaIcon(
+                    drawableResource = R.drawable.figma_wifi_off,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(19.dp))
+
+            Text(
+                text = "Sem conexão",
+                color = CinematecaColors.OnBackground,
+                fontSize = 19.sp,
+                lineHeight = 29.sp,
+                fontWeight = FontWeight.Medium,
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = "Verifique sua conexão e tente novamente.",
+                color = CinematecaColors.SecondaryText,
+                fontSize = 17.sp,
+                lineHeight = 24.sp,
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Surface(
+                onClick = onRetry,
+                color = CinematecaColors.Primary,
+                shape = PillShape,
+                modifier = Modifier.height(44.dp),
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                ) {
+                    Text(
+                        text = "Tentar novamente",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
         }
     }
 }

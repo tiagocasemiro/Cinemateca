@@ -3,6 +3,7 @@ package com.cinemateca.features.trailers.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -19,6 +20,7 @@ import com.cinemateca.features.trailers.home.components.HomeErrorContent
 import com.cinemateca.features.trailers.home.components.HomeFilters
 import com.cinemateca.features.trailers.home.components.HomeHeader
 import com.cinemateca.features.trailers.home.components.HomeLoadingContent
+import com.cinemateca.features.trailers.home.components.HomeOfflineContent
 
 @Composable
 fun HomeScreen(
@@ -39,16 +41,24 @@ fun HomeScreen(
         HomeHeader()
         HomeFilters(
             movieCount = uiState.trailers.size.takeUnless {
-                uiState.isLoading && uiState.trailers.isEmpty()
+                uiState.isOffline ||
+                    (uiState.isLoading && uiState.trailers.isEmpty())
             },
         )
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(1f)
                 .background(CinematecaColors.Background),
         ) {
             when {
+                uiState.isOffline -> HomeOfflineContent(
+                    onRetry = {
+                        onAction(HomeUiAction.Retry)
+                    },
+                )
+
                 uiState.trailers.isNotEmpty() -> HomeContent(
                     trailers = uiState.trailers,
                     onTrailerClick = onTrailerClick,
@@ -145,6 +155,22 @@ private fun HomeErrorPreview() {
             uiState = HomeUiState(
                 errorMessage = "Não foi possível carregar os filmes.",
             ),
+            onAction = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Home - Sem conexão",
+    showBackground = true,
+    widthDp = 378,
+    heightDp = 844,
+)
+@Composable
+private fun HomeOfflinePreview() {
+    CinematecaTheme {
+        HomeScreen(
+            uiState = HomeUiState(isOffline = true),
             onAction = {},
         )
     }

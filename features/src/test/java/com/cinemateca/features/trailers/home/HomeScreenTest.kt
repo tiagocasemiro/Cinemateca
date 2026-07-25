@@ -75,6 +75,30 @@ class HomeScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `renders Figma offline state and forwards retry action`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isOffline = true),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Sem conexão").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Verifique sua conexão e tente novamente.")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Sem conexão com a internet")
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Tentar novamente").performClick()
+
+        assertEquals(listOf(HomeUiAction.Retry), actions)
+    }
+
     private fun trailer() = HomeTrailerItemUiModel(
         id = "transformers",
         title = "Transformers: O Início",

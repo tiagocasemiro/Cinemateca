@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Loading
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
 import java.time.OffsetDateTime
@@ -15,20 +16,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val getTrendingTrailersUseCase: GetTrendingTrailersUseCase,
+    private val observeInternetConnectionUseCase: ObserveInternetConnectionUseCase,
 ) : ViewModel() {
 
     private val mutableUiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = mutableUiState.asStateFlow()
 
     private var loadTrendingJob: Job? = null
+    private var hasRequestedInitialLoad = false
 
     init {
-        loadTrending()
+        observeInternetConnection()
     }
 
     fun onAction(action: HomeUiAction) {
@@ -39,7 +43,44 @@ class HomeViewModel(
         }
     }
 
+    private fun observeInternetConnection() {
+        viewModelScope.launch {
+            observeInternetConnectionUseCase()
+                .catch { throwable ->
+                    if (throwable is CancellationException) throw throwable
+                    emit(false)
+                }
+                .collect { isAvailable ->
+                    val wasOffline = mutableUiState.value.isOffline
+
+                    mutableUiState.update {
+                        it.copy(
+                            isOffline = !isAvailable,
+                            isLoading = if (isAvailable) {
+                                it.isLoading
+                            } else {
+                                false
+                            },
+                            errorMessage = if (isAvailable) {
+                                it.errorMessage
+                            } else {
+                                null
+                            },
+                        )
+                    }
+
+                    if (!isAvailable) {
+                        loadTrendingJob?.cancel()
+                    } else if (!hasRequestedInitialLoad || wasOffline) {
+                        hasRequestedInitialLoad = true
+                        loadTrending()
+                    }
+                }
+        }
+    }
+
     private fun loadTrending() {
+        if (mutableUiState.value.isOffline) return
         if (loadTrendingJob?.isActive == true) return
 
         loadTrendingJob = viewModelScope.launch {

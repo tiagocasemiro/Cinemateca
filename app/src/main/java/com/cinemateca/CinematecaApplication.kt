@@ -1,6 +1,7 @@
 package com.cinemateca
 
 import android.app.Application
+import com.cinemateca.connectivity.di.connectivityModule
 import com.cinemateca.di.useCaseModule
 import com.cinemateca.features.di.featuresModule
 import com.cinemateca.networking.di.kinoCheckNetworkingModule
@@ -14,6 +15,7 @@ class CinematecaApplication : Application() {
         startKoin {
             androidContext(this@CinematecaApplication)
             modules(
+                connectivityModule,
                 kinoCheckNetworkingModule(),
                 useCaseModule,
                 featuresModule,

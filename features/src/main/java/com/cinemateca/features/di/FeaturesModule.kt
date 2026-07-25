@@ -8,6 +8,7 @@ val featuresModule = module {
     viewModel {
         HomeViewModel(
             getTrendingTrailersUseCase = get(),
+            observeInternetConnectionUseCase = get(),
         )
     }
 }

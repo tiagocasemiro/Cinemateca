@@ -2,6 +2,7 @@ package com.cinemateca.features.trailers.home
 
 data class HomeUiState(
     val isLoading: Boolean = false,
+    val isOffline: Boolean = false,
     val trailers: List<HomeTrailerItemUiModel> = emptyList(),
     val errorMessage: String? = null,
 )
