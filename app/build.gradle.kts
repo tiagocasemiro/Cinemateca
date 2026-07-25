@@ -44,6 +44,7 @@ dependencies {
     val firebaseBom = platform("com.google.firebase:firebase-bom:33.2.0")
 
     implementation(project(":domain"))
+    implementation(project(":features"))
     implementation(project(":networking"))
 
     implementation("androidx.core:core-ktx:1.13.1")
