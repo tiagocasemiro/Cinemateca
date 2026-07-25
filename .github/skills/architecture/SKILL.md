@@ -1,5 +1,5 @@
 ---
-name: android-app-architecture
+name: architecture
 description: Criar e manter aplicativos Android nativos com MVVM, Clean Architecture e Jetpack Compose. Usar ao adicionar, modificar, revisar ou apagar elementos das camadas View, ViewModel, UseCase e Repository, incluindo navegação, estado, coroutines, acesso a dados, analytics, injeção de dependências, testes funcionais, testes de arquitetura e convenções arquiteturais.
 ---
 
