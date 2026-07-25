@@ -53,3 +53,6 @@ Repository (API / Database)
 - Konsist
 - Robolectric
 - coil
+- Gson
+- Paging 3
+- Media3
