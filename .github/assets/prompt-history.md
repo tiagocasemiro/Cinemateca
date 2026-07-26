@@ -61,3 +61,7 @@ $android-app-architecture a implementação do room com a consulta a banco local
 Crie a tela de detalhe do trailer clicado. A tela possui scroll com isso vou passar 2 layouts com o topo da tela e a base da tela, no meio tem o conteudo que ficou nas 2 partes. No fundo da tela tem a mesma imagem usada no topo, esticada, aplicado blur e colocado uma mascara preta com 80% de transparencia, a imagem com blur + mascara com transparencia ficam no fundo da tela por tras do conteudo. O background dos botões de compartilhar e voltar tem uma transparencia levemente escura com blur. Figma urls, topo: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=9-1645&t=h9eFD3oIOp74GJK6-4 e base: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=9-1830&t=h9eFD3oIOp74GJK6-4
 
 Atualize as cores do botão de favorito e querro assistir quando selecionados. use o layout do figma url: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=9-1986&t=h9eFD3oIOp74GJK6-4
+
+Na pasta /home/tiagocasemiro/Imagens/cinemateca_launcher_icons voce vai encontrar todos os icones para adicionar ao app. Adicione o icone com todas as configurações recomentadas
+
+Atualize o estado de loading da tela de detalhes https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=13-2171&t=h9eFD3oIOp74GJK6-4

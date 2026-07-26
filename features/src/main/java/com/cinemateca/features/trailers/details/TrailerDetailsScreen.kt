@@ -3,7 +3,6 @@ package com.cinemateca.features.trailers.details
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import com.cinemateca.features.designsystem.CinematecaTheme
 import com.cinemateca.features.trailers.details.components.TrailerDetailsBackground
 import com.cinemateca.features.trailers.details.components.TrailerDetailsContent
 import com.cinemateca.features.trailers.details.components.TrailerDetailsError
+import com.cinemateca.features.trailers.details.components.TrailerDetailsLoading
 
 @Composable
 fun TrailerDetailsScreen(
@@ -48,9 +48,8 @@ fun TrailerDetailsScreen(
                 onYouTubeClick = onYouTubeClick,
             )
 
-            uiState.isLoading -> CircularProgressIndicator(
-                color = CinematecaColors.Primary,
-                modifier = Modifier.align(Alignment.Center),
+            uiState.isLoading -> TrailerDetailsLoading(
+                onBackClick = onBackClick,
             )
 
             uiState.errorMessage != null -> TrailerDetailsError(
@@ -68,6 +67,25 @@ fun TrailerDetailsScreen(
                 modifier = Modifier.align(Alignment.Center),
             )
         }
+    }
+}
+
+@Preview(
+    name = "Detalhes do trailer - Carregando",
+    showBackground = true,
+    widthDp = 378,
+    heightDp = 844,
+)
+@Composable
+private fun TrailerDetailsLoadingPreview() {
+    CinematecaTheme {
+        TrailerDetailsScreen(
+            uiState = TrailerDetailsUiState(),
+            onAction = {},
+            onBackClick = {},
+            onShareClick = {},
+            onYouTubeClick = {},
+        )
     }
 }
 

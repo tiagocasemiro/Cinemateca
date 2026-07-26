@@ -224,7 +224,7 @@ private fun TrailerHero(
 }
 
 @Composable
-private fun GlassIconButton(
+internal fun GlassIconButton(
     contentDescription: String,
     onClick: () -> Unit,
     content: @Composable () -> Unit,

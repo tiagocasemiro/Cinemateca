@@ -20,6 +20,32 @@ class TrailerDetailsScreenTest {
     val composeRule = createComposeRule()
 
     @Test
+    fun `renders loading skeleton and forwards back click`() {
+        var backClicks = 0
+        composeRule.setContent {
+            CinematecaTheme {
+                TrailerDetailsScreen(
+                    uiState = TrailerDetailsUiState(),
+                    onAction = {},
+                    onBackClick = { backClicks++ },
+                    onShareClick = {},
+                    onYouTubeClick = {},
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription("Carregando detalhes do trailer")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Voltar")
+            .assertIsDisplayed()
+            .performClick()
+
+        assertEquals(1, backClicks)
+    }
+
+    @Test
     fun `renders the complete trailer details layout`() {
         composeRule.setContent {
             CinematecaTheme {
