@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
+import com.cinemateca.features.trailers.home.HomeFilterOption
 import com.cinemateca.features.trailers.home.HomeTrailerItemUiModel
 
 private val CardShape = RoundedCornerShape(14.dp)
@@ -137,6 +138,8 @@ internal fun HomeHeader(
 internal fun HomeFilters(
     movieCount: Int?,
     sortOptionLabel: String,
+    selectedFilter: HomeFilterOption,
+    onFilterClick: (HomeFilterOption) -> Unit,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -156,16 +159,15 @@ internal fun HomeFilters(
             ),
         ) {
             items(
-                items = listOf(
-                    "Todos",
-                    "Em Cartaz",
-                    "Lançamentos",
-                    "Em Breve",
-                ),
-            ) { label ->
+                items = HomeFilterOption.entries,
+                key = HomeFilterOption::name,
+            ) { option ->
                 FilterChip(
-                    text = label,
-                    selected = label == "Todos",
+                    text = option.label,
+                    selected = option == selectedFilter,
+                    onClick = {
+                        onFilterClick(option)
+                    },
                 )
             }
         }
@@ -325,6 +327,7 @@ private fun SkeletonLine(
 private fun FilterChip(
     text: String,
     selected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -342,7 +345,20 @@ private fun FilterChip(
                 Color.White.copy(alpha = 0.08f)
             },
         ),
-        modifier = modifier.height(31.dp),
+        modifier = modifier
+            .height(31.dp)
+            .clickable(
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .semantics {
+                contentDescription = if (selected) {
+                    "Filtro $text selecionado"
+                } else {
+                    "Filtrar por $text"
+                }
+                role = Role.Button
+            },
     ) {
         Box(
             contentAlignment = Alignment.Center,

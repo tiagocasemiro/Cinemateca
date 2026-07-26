@@ -153,6 +153,38 @@ class HomeScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `forwards filter selection and renders the selected chip`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        filterOption = HomeFilterOption.Upcoming,
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription("Filtro Em Breve selecionado")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Filtrar por Em Cartaz")
+            .performClick()
+
+        assertEquals(
+            listOf(
+                HomeUiAction.SelectFilterOption(
+                    HomeFilterOption.NowPlaying,
+                ),
+            ),
+            actions,
+        )
+    }
+
     private fun trailer() = HomeTrailerItemUiModel(
         id = "transformers",
         title = "Transformers: O Início",

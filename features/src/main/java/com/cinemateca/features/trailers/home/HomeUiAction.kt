@@ -6,4 +6,7 @@ sealed interface HomeUiAction {
     data class SelectSortOption(
         val option: HomeSortOption,
     ) : HomeUiAction
+    data class SelectFilterOption(
+        val option: HomeFilterOption,
+    ) : HomeUiAction
 }

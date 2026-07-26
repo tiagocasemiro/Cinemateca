@@ -54,6 +54,10 @@ fun HomeScreen(
                     (uiState.isLoading && uiState.trailers.isEmpty())
             },
             sortOptionLabel = uiState.sortOption.label,
+            selectedFilter = uiState.filterOption,
+            onFilterClick = { option ->
+                onAction(HomeUiAction.SelectFilterOption(option))
+            },
             onSortClick = {
                 isSortSheetVisible = true
             },

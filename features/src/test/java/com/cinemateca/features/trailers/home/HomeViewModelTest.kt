@@ -13,6 +13,7 @@ import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import java.time.OffsetDateTime
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -219,6 +220,115 @@ class HomeViewModelTest {
             )
         }
 
+    @Test
+    fun `filters loaded trailers by the calculated movie release window`() =
+        runTest {
+            val now = OffsetDateTime.now()
+            coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+                trailerPage(
+                    trailers = listOf(
+                        trailer(
+                            id = "released",
+                            title = "Zulu",
+                            published = now.minusMonths(2).toString(),
+                        ),
+                        trailer(
+                            id = "upcoming",
+                            title = "Charlie",
+                            published = now.minusDays(10).toString(),
+                        ),
+                        trailer(
+                            id = "now-playing-late",
+                            title = "Bravo",
+                            published = now
+                                .minusMonths(1)
+                                .minusDays(20)
+                                .toString(),
+                        ),
+                        trailer(
+                            id = "now-playing-early",
+                            title = "Alpha",
+                            published = now
+                                .minusMonths(1)
+                                .minusDays(5)
+                                .toString(),
+                        ),
+                        trailer(
+                            id = "unknown-date",
+                            title = "Data desconhecida",
+                            published = "invalid",
+                        ),
+                    ),
+                ),
+            )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(
+                HomeUiAction.SelectSortOption(
+                    HomeSortOption.Alphabetical,
+                ),
+            )
+            viewModel.onAction(
+                HomeUiAction.SelectFilterOption(
+                    HomeFilterOption.NowPlaying,
+                ),
+            )
+
+            assertEquals(
+                HomeFilterOption.NowPlaying,
+                viewModel.uiState.value.filterOption,
+            )
+            assertEquals(
+                listOf("now-playing-early", "now-playing-late"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(
+                HomeUiAction.SelectFilterOption(
+                    HomeFilterOption.Releases,
+                ),
+            )
+            assertEquals(
+                listOf("released"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(
+                HomeUiAction.SelectFilterOption(
+                    HomeFilterOption.Upcoming,
+                ),
+            )
+            assertEquals(
+                listOf("upcoming"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(
+                HomeUiAction.SelectFilterOption(
+                    HomeFilterOption.All,
+                ),
+            )
+            assertEquals(
+                listOf(
+                    "now-playing-early",
+                    "now-playing-late",
+                    "upcoming",
+                    "unknown-date",
+                    "released",
+                ),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+        }
+
     private fun createViewModel() = HomeViewModel(
         getTrendingTrailersUseCase = getTrendingTrailersUseCase,
         observeInternetConnectionUseCase = observeInternetConnectionUseCase,
@@ -241,6 +351,7 @@ class HomeViewModelTest {
         title: String = "Trailer em alta",
         published: String? = "2026-07-25T10:00:00-03:00",
         views: Long? = 42,
+        categories: List<String> = listOf("Trailer"),
     ) = Trailer(
         id = id,
         youtubeVideoId = "youtube-1",
@@ -250,7 +361,7 @@ class HomeViewModelTest {
         url = "https://kinocheck.com/trailer/1",
         thumbnail = "https://cdn.kinocheck.com/1.jpg",
         language = "pt",
-        categories = listOf("Trailer"),
+        categories = categories,
         genres = listOf("Action"),
         published = published,
         views = views,

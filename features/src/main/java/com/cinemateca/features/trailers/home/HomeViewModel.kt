@@ -1,5 +1,7 @@
 package com.cinemateca.features.trailers.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cinemateca.domain.Failure
@@ -43,6 +45,9 @@ class HomeViewModel(
             -> loadTrending()
 
             is HomeUiAction.SelectSortOption -> selectSortOption(action.option)
+            is HomeUiAction.SelectFilterOption -> selectFilterOption(
+                action.option,
+            )
         }
     }
 
@@ -50,7 +55,22 @@ class HomeViewModel(
         mutableUiState.update {
             it.copy(
                 sortOption = option,
-                trailers = loadedTrailers.toUiModels(option),
+                trailers = loadedTrailers.toUiModels(
+                    sortOption = option,
+                    filterOption = it.filterOption,
+                ),
+            )
+        }
+    }
+
+    private fun selectFilterOption(option: HomeFilterOption) {
+        mutableUiState.update {
+            it.copy(
+                filterOption = option,
+                trailers = loadedTrailers.toUiModels(
+                    sortOption = it.sortOption,
+                    filterOption = option,
+                ),
             )
         }
     }
@@ -110,7 +130,8 @@ class HomeViewModel(
                         mutableUiState.update {
                             it.copy(
                                 trailers = loadedTrailers.toUiModels(
-                                    it.sortOption,
+                                    sortOption = it.sortOption,
+                                    filterOption = it.filterOption,
                                 ),
                             )
                         }
@@ -147,24 +168,64 @@ class HomeViewModel(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 private fun List<Trailer>.toUiModels(
     sortOption: HomeSortOption,
+    filterOption: HomeFilterOption,
 ): List<HomeTrailerItemUiModel> {
+    val now = OffsetDateTime.now()
+    val filteredTrailers = filter { trailer ->
+        trailer.matchesFilter(
+            filterOption = filterOption,
+            now = now,
+        )
+    }
+
     val sortedTrailers = when (sortOption) {
-        HomeSortOption.MostRecent -> sortedByDescending {
+        HomeSortOption.MostRecent -> filteredTrailers.sortedByDescending {
             it.published.orEmpty()
         }
 
-        HomeSortOption.MostPopular -> sortedByDescending {
+        HomeSortOption.MostPopular -> filteredTrailers.sortedByDescending {
             it.views ?: 0L
         }
 
-        HomeSortOption.Alphabetical -> sortedBy {
+        HomeSortOption.Alphabetical -> filteredTrailers.sortedBy {
             it.title.lowercase(Locale.forLanguageTag("pt-BR"))
         }
     }
 
     return sortedTrailers.map(Trailer::toUiModel)
+}
+
+private fun Trailer.matchesFilter(
+    filterOption: HomeFilterOption,
+    now: OffsetDateTime,
+): Boolean {
+    if (filterOption == HomeFilterOption.All) return true
+
+    val trailerPublishedAt = published
+        ?.let { value ->
+            runCatching {
+                OffsetDateTime.parse(value)
+            }.getOrNull()
+        }
+        ?: return false
+    val movieReleaseAt = trailerPublishedAt.plusMonths(1)
+    val movieLeavesTheatersAt = movieReleaseAt.plusWeeks(3)
+
+    return when (filterOption) {
+        HomeFilterOption.All -> true
+        HomeFilterOption.NowPlaying ->
+            !now.isBefore(movieReleaseAt) &&
+                now.isBefore(movieLeavesTheatersAt)
+
+        HomeFilterOption.Releases ->
+            !now.isBefore(movieLeavesTheatersAt)
+
+        HomeFilterOption.Upcoming ->
+            now.isBefore(movieReleaseAt)
+    }
 }
 
 private fun Trailer.toUiModel() = HomeTrailerItemUiModel(

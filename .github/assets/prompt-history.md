@@ -45,3 +45,7 @@ Atualize o estado de loading esse layout https://www.figma.com/design/v6Ene6gKWw
 $android-app-architecture Adicione detecção de queda de internet, mesmo quando o device continua ligado a rede. Ao abrir o app sem conexão exiba a esta tela https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=3-136&t=h9eFD3oIOp74GJK6-4
 
 Ao clicar no botão mais recentes, Exiba um botom sheet como no layout https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=5-248&t=h9eFD3oIOp74GJK6-4. Após seleção de uma nova forma de ordenar, o texto Mais Recentes ao lado do icone de ordenação será substituido pela nova frma de ordenar.
+
+Ao clicar em um dos filtros "Todos", "Em Cartaz", "Lançamentos", "Em Breve", Selecione o botão clicado e aplique o filtro na listagem.
+
+Considerenado que um filme fique 3 semanas em cartas e que a data de lancamento do trailer acontece 1 mes antes do lancamento do filme. Atulaize os filtros "Todos", "Em Cartaz", "Lançamentos", "Em Breve" baseando se na data de publicação do trailer
