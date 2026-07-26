@@ -372,3 +372,5 @@ Atualise as cores dos botões favoritar e quero assistir da home para ficarem co
 Adicione a skill da pasta .github/skills/architecture a regra que toda string deve ser criada no arquiovo de strings do android
 
 $android-app-architecture Procure migre todas as strings em código para o arquivo de strings
+
+Nos botões de favorito o icone de coração fica preenchido quando selecionado. Deixe o icone dos botões de quero assistir também preenchidos quando selecionado
