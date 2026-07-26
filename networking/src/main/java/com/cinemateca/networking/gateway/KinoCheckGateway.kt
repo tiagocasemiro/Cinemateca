@@ -42,4 +42,11 @@ internal interface KinoCheckGateway {
         @Query("categories") categories: String?,
         @Query("language") language: String?,
     ): Response<MovieResponse>
+
+    @GET("shows")
+    suspend fun getShow(
+        @Query("id") id: String,
+        @Query("categories") categories: String?,
+        @Query("language") language: String?,
+    ): Response<MovieResponse>
 }

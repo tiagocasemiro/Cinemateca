@@ -32,7 +32,11 @@ fun HomeScreen(
     uiState: HomeUiState,
     onAction: (HomeUiAction) -> Unit,
     modifier: Modifier = Modifier,
-    onTrailerClick: (String) -> Unit = {},
+    onTrailerClick: (
+        trailerId: String,
+        movieId: String,
+        resourceType: String,
+    ) -> Unit = { _, _, _ -> },
 ) {
     var isSortSheetVisible by rememberSaveable {
         mutableStateOf(false)
@@ -128,6 +132,8 @@ fun HomeScreen(
 private val previewTrailers = listOf(
     HomeTrailerItemUiModel(
         id = "transformers",
+        movieId = "transformers-movie",
+        resourceType = "movie",
         title = "Transformers: O Início",
         thumbnailUrl = null,
         genres = "Ficção Científica / Ação",
@@ -137,6 +143,8 @@ private val previewTrailers = listOf(
     ),
     HomeTrailerItemUiModel(
         id = "deadpool",
+        movieId = "deadpool-movie",
+        resourceType = "movie",
         title = "Deadpool & Wolverine",
         thumbnailUrl = null,
         genres = "Ação / Comédia",
@@ -144,6 +152,8 @@ private val previewTrailers = listOf(
     ),
     HomeTrailerItemUiModel(
         id = "wicked",
+        movieId = "wicked-movie",
+        resourceType = "movie",
         title = "Wicked",
         thumbnailUrl = null,
         genres = "Musical / Drama",

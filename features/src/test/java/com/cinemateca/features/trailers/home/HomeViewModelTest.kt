@@ -13,6 +13,7 @@ import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
 import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
 import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.PageMetadata
+import com.cinemateca.domain.trailers.model.MediaReference
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.model.TrailerPage
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
@@ -84,6 +85,8 @@ class HomeViewModelTest {
             listOf(
                 HomeTrailerItemUiModel(
                     id = "trailer-1",
+                    movieId = "trailer-1",
+                    resourceType = "",
                     title = "Trailer em alta",
                     thumbnailUrl = "https://cdn.kinocheck.com/1.jpg",
                     genres = "Action",
@@ -146,6 +149,29 @@ class HomeViewModelTest {
                     .isWatchlisted,
             )
         }
+
+    @Test
+    fun `uses the referenced movie id for persisted selections`() = runTest {
+        favoriteMovieIds.value = setOf("movie-alpha")
+        coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+            trailerPage(
+                trailers = listOf(
+                    trailer(
+                        id = "trailer-alpha",
+                        resourceId = "movie-alpha",
+                    ),
+                ),
+            ),
+        )
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        val item = viewModel.uiState.value.trailers.single()
+        assertEquals("movie-alpha", item.movieId)
+        assertEquals("movie", item.resourceType)
+        assertTrue(item.isFavorite)
+    }
 
     @Test
     fun `shows domain failure and retries the request`() = runTest {
@@ -474,6 +500,7 @@ class HomeViewModelTest {
         published: String? = "2026-07-25T10:00:00-03:00",
         views: Long? = 42,
         categories: List<String> = listOf("Trailer"),
+        resourceId: String? = null,
     ) = Trailer(
         id = id,
         youtubeVideoId = "youtube-1",
@@ -487,7 +514,15 @@ class HomeViewModelTest {
         genres = listOf("Action"),
         published = published,
         views = views,
-        resource = null,
+        resource = resourceId?.let { movieId ->
+            MediaReference(
+                type = "movie",
+                path = "/movies/",
+                kinoCheckId = movieId,
+                imdbId = null,
+                tmdbId = null,
+            )
+        },
     )
 }
 

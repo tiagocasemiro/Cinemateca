@@ -310,9 +310,12 @@ private fun List<Trailer>.toUiModels(
     }
 
     return sortedTrailers.map { trailer ->
+        val movieId = trailer.resource?.kinoCheckId ?: trailer.id
         trailer.toUiModel(
-            isFavorite = trailer.id in favoriteMovieIds,
-            isWatchlisted = trailer.id in watchlistMovieIds,
+            movieId = movieId,
+            resourceType = trailer.resource?.type.orEmpty(),
+            isFavorite = movieId in favoriteMovieIds,
+            isWatchlisted = movieId in watchlistMovieIds,
         )
     }
 }
@@ -348,10 +351,14 @@ private fun Trailer.matchesFilter(
 }
 
 private fun Trailer.toUiModel(
+    movieId: String,
+    resourceType: String,
     isFavorite: Boolean,
     isWatchlisted: Boolean,
 ) = HomeTrailerItemUiModel(
     id = id,
+    movieId = movieId,
+    resourceType = resourceType,
     title = title,
     thumbnailUrl = thumbnail ?: youtubeThumbnail,
     genres = genres

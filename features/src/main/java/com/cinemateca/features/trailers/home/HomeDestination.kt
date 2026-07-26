@@ -7,6 +7,11 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeDestination(
+    onTrailerClick: (
+        trailerId: String,
+        movieId: String,
+        resourceType: String,
+    ) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -14,5 +19,6 @@ fun HomeDestination(
     HomeScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onTrailerClick = onTrailerClick,
     )
 }

@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.cinemateca.features.trailers.details.TrailerDetailsDestination
 import com.cinemateca.features.trailers.home.HomeDestination
 
 @Composable
@@ -30,7 +31,22 @@ fun AppNavHost(
         modifier = modifier,
     ) {
         composable<HomeRoute> {
-            HomeDestination()
+            HomeDestination(
+                onTrailerClick = { trailerId, movieId, resourceType ->
+                    navController.navigate(
+                        TrailerDetailsRoute(
+                            movieId = movieId,
+                            trailerId = trailerId,
+                            resourceType = resourceType,
+                        ),
+                    )
+                },
+            )
+        }
+        composable<TrailerDetailsRoute> {
+            TrailerDetailsDestination(
+                onNavigateBack = navController::popBackStack,
+            )
         }
     }
 }

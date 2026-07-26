@@ -12,7 +12,11 @@ object CinematecaColors {
     val ButtonSurface = Color(0xFF222230)
     val Primary = Color(0xFF4D8EFF)
     val Favorite = Color(0xFFFF4D6A)
+    val FavoriteSelectedSurface = Color(0xFFC0394F)
+    val FavoriteSelectedOutline = Color(0xFFE04060)
     val OnBackground = Color.White
+    val WatchlistSelectedSurface = Color(0xFF2A5ACC)
+    val WatchlistSelectedOutline = Color(0xFF4D8EFF)
     val SecondaryText = Color.White.copy(alpha = 0.5f)
     val TertiaryText = Color.White.copy(alpha = 0.3f)
     val ButtonText = Color(0xFFC0C0D8)

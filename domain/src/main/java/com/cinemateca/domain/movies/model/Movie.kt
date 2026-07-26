@@ -22,3 +22,19 @@ data class MovieSummary(
     val title: String,
     val url: String?,
 )
+
+enum class MediaResourceType {
+    Movie,
+    Show,
+    ;
+
+    companion object {
+        fun fromApiValue(value: String?): MediaResourceType {
+            return if (value.equals("show", ignoreCase = true)) {
+                Show
+            } else {
+                Movie
+            }
+        }
+    }
+}

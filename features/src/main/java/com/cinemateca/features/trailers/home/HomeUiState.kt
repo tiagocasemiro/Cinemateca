@@ -31,6 +31,8 @@ enum class HomeFilterOption(
 
 data class HomeTrailerItemUiModel(
     val id: String,
+    val movieId: String,
+    val resourceType: String,
     val title: String,
     val thumbnailUrl: String?,
     val genres: String,

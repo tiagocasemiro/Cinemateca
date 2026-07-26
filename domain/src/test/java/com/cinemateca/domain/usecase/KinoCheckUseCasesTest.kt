@@ -5,6 +5,7 @@ import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Result
 import com.cinemateca.domain.Success
 import com.cinemateca.domain.movies.model.Movie
+import com.cinemateca.domain.movies.model.MediaResourceType
 import com.cinemateca.domain.movies.model.MovieSummary
 import com.cinemateca.domain.movies.model.MovieVideoFilters
 import com.cinemateca.domain.movies.repository.MovieRepository
@@ -212,6 +213,7 @@ private class FakeMovieRepository(
     override suspend fun getByKinoCheckId(
         id: String,
         filters: MovieVideoFilters,
+        resourceType: MediaResourceType,
     ): Result<Movie> = record(MovieOperation.KINO_CHECK_ID, id, filters)
 
     override suspend fun getByTmdbId(

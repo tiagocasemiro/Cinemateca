@@ -2,6 +2,7 @@ package com.cinemateca.domain.movies.repository
 
 import com.cinemateca.domain.Result
 import com.cinemateca.domain.movies.model.Movie
+import com.cinemateca.domain.movies.model.MediaResourceType
 import com.cinemateca.domain.movies.model.MovieVideoFilters
 
 interface MovieRepository {
@@ -9,6 +10,7 @@ interface MovieRepository {
         suspend fun getByKinoCheckId(
             id: String,
             filters: MovieVideoFilters = MovieVideoFilters(),
+            resourceType: MediaResourceType = MediaResourceType.Movie,
         ): Result<Movie>
 
         suspend fun getByTmdbId(

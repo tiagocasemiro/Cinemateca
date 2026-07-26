@@ -2,6 +2,7 @@ package com.cinemateca.networking.adapter
 
 import com.cinemateca.domain.Result
 import com.cinemateca.domain.movies.model.Movie
+import com.cinemateca.domain.movies.model.MediaResourceType
 import com.cinemateca.domain.movies.model.MovieVideoFilters
 import com.cinemateca.domain.movies.repository.MovieRepository
 import com.cinemateca.networking.gateway.KinoCheckGateway
@@ -14,9 +15,13 @@ internal class MovieRemoteImpl(
     override suspend fun getByKinoCheckId(
         id: String,
         filters: MovieVideoFilters,
+        resourceType: MediaResourceType,
     ): Result<Movie> {
         require(id.isNotBlank()) { "id must not be blank" }
-        return getMovie(id = id, filters = filters)
+        return when (resourceType) {
+            MediaResourceType.Movie -> getMovie(id = id, filters = filters)
+            MediaResourceType.Show -> getShow(id = id, filters = filters)
+        }
     }
 
     override suspend fun getByTmdbId(
@@ -46,6 +51,21 @@ internal class MovieRemoteImpl(
                 id = id,
                 tmdbId = tmdbId,
                 imdbId = imdbId,
+                categories = filters.categories
+                    .takeIf { it.isNotEmpty() }
+                    ?.joinToString(separator = ",") { it.value },
+                language = filters.language?.code,
+            ).extractData()
+        }
+    }
+
+    private suspend fun getShow(
+        id: String,
+        filters: MovieVideoFilters,
+    ): Result<Movie> {
+        return fetchData {
+            gateway.getShow(
+                id = id,
                 categories = filters.categories
                     .takeIf { it.isNotEmpty() }
                     ?.joinToString(separator = ",") { it.value },

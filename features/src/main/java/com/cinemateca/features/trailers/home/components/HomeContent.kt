@@ -496,7 +496,11 @@ private fun FilterChip(
 @Composable
 internal fun HomeContent(
     trailers: List<HomeTrailerItemUiModel>,
-    onTrailerClick: (String) -> Unit,
+    onTrailerClick: (
+        trailerId: String,
+        movieId: String,
+        resourceType: String,
+    ) -> Unit,
     onFavoriteClick: (String) -> Unit,
     onWatchClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -518,13 +522,17 @@ internal fun HomeContent(
             MovieCard(
                 trailer = trailer,
                 onClick = {
-                    onTrailerClick(trailer.id)
+                    onTrailerClick(
+                        trailer.id,
+                        trailer.movieId,
+                        trailer.resourceType,
+                    )
                 },
                 onFavoriteClick = {
-                    onFavoriteClick(trailer.id)
+                    onFavoriteClick(trailer.movieId)
                 },
                 onWatchClick = {
-                    onWatchClick(trailer.id)
+                    onWatchClick(trailer.movieId)
                 },
             )
         }

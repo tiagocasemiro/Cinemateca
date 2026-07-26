@@ -275,15 +275,46 @@ class HomeScreenTest {
 
         assertEquals(
             listOf(
-                HomeUiAction.ToggleFavorite("transformers"),
-                HomeUiAction.ToggleWatchlist("transformers"),
+                HomeUiAction.ToggleFavorite("transformers-movie"),
+                HomeUiAction.ToggleWatchlist("transformers-movie"),
             ),
             actions,
         )
     }
 
+    @Test
+    fun `forwards trailer and movie ids when a card is clicked`() {
+        var clickedIds: Triple<String, String, String>? = null
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = {},
+                    onTrailerClick = { trailerId, movieId, resourceType ->
+                        clickedIds = Triple(
+                            trailerId,
+                            movieId,
+                            resourceType,
+                        )
+                    },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Transformers: O Início").performClick()
+
+        assertEquals(
+            Triple("transformers", "transformers-movie", "movie"),
+            clickedIds,
+        )
+    }
+
     private fun trailer() = HomeTrailerItemUiModel(
         id = "transformers",
+        movieId = "transformers-movie",
+        resourceType = "movie",
         title = "Transformers: O Início",
         thumbnailUrl = null,
         genres = "Ficção Científica / Ação",

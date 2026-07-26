@@ -2,6 +2,7 @@ package com.cinemateca.networking.adapter
 
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.movies.model.MediaResourceType
 import com.cinemateca.domain.movies.model.MovieVideoFilters
 import com.cinemateca.domain.trailers.model.ContentLanguage
 import com.cinemateca.domain.trailers.model.TrailerFilters
@@ -112,6 +113,21 @@ class KinoCheckRepositoryTest {
         assertEquals(null, imdbUrl.queryParameter("id"))
         assertEquals("Trailer,Featurette", imdbUrl.queryParameter("categories"))
         assertEquals("de", imdbUrl.queryParameter("language"))
+    }
+
+    @Test
+    fun `KinoCheck show resource uses the shows endpoint`() = runTest {
+        server.enqueue(jsonResponse(MOVIE_JSON))
+
+        val result = movieRepository.getByKinoCheckId(
+            id = "show-1",
+            resourceType = MediaResourceType.Show,
+        )
+
+        assertTrue(result is Success)
+        val requestUrl = requireNotNull(server.takeRequest().requestUrl)
+        assertEquals("/shows", requestUrl.encodedPath)
+        assertEquals("show-1", requestUrl.queryParameter("id"))
     }
 
     @Test
