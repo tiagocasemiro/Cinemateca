@@ -229,11 +229,12 @@ private fun TrailerHero(
 internal fun GlassIconButton(
     contentDescription: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .size(43.dp)
             .clip(CircleShape),
     ) {

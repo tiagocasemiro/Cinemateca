@@ -77,3 +77,7 @@ os 2 icones da pasta app/src/main/res/mipmap estão apresentando erro
 Os 2 drawables da pasta mipmap estão dando erro. todos os icones redondos das pastas mipmap estão quadrados.
 
 Na tela de detalhes click nos materiais promoconais na tela de detalhes não funcionando. Deveriam abrir no youtube ou navegador
+
+Adicionar estado  sem conexao na tela de detalhes detalhes
+
+Reultilize o composable de sem conexão da home. O objetivo é padronizar a experiencia e reduzir a quantidade de código

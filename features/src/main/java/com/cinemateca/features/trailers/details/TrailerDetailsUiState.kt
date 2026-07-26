@@ -2,6 +2,7 @@ package com.cinemateca.features.trailers.details
 
 data class TrailerDetailsUiState(
     val isLoading: Boolean = true,
+    val isOffline: Boolean = false,
     val details: TrailerDetailsUiModel? = null,
     val errorMessage: String? = null,
 )

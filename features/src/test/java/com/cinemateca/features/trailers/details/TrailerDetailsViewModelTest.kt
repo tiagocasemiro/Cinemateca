@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.cinemateca.domain.Error
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.connectivity.repository.InternetConnectionRepository
+import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
 import com.cinemateca.domain.movies.model.Movie
 import com.cinemateca.domain.movies.repository.FavoriteMovieRepository
 import com.cinemateca.domain.movies.repository.WatchlistMovieRepository
@@ -38,6 +40,7 @@ class TrailerDetailsViewModelTest {
     private val getMovieUseCase = mockk<GetMovieByKinoCheckIdUseCase>()
     private val favoriteIds = MutableStateFlow<Set<String>>(emptySet())
     private val watchlistIds = MutableStateFlow<Set<String>>(emptySet())
+    private val isInternetAvailable = MutableStateFlow(true)
     private val favoriteRepository = FakeFavoriteRepository(favoriteIds)
     private val watchlistRepository = FakeWatchlistRepository(watchlistIds)
 
@@ -102,6 +105,27 @@ class TrailerDetailsViewModelTest {
         )
     }
 
+    @Test
+    fun `shows offline state and loads details when connection returns`() = runTest {
+        isInternetAvailable.value = false
+        coEvery {
+            getMovieUseCase("movie-1", any(), any())
+        } returns Success(movie())
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isOffline)
+        assertFalse(viewModel.uiState.value.isLoading)
+        assertEquals(null, viewModel.uiState.value.details)
+
+        isInternetAvailable.value = true
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isOffline)
+        assertEquals("Movie title", viewModel.uiState.value.details?.title)
+    }
+
     private fun createViewModel() = TrailerDetailsViewModel(
         savedStateHandle = SavedStateHandle(
             mapOf(
@@ -111,6 +135,11 @@ class TrailerDetailsViewModelTest {
             ),
         ),
         getMovieByKinoCheckIdUseCase = getMovieUseCase,
+        observeInternetConnectionUseCase = ObserveInternetConnectionUseCase(
+            repository = FakeInternetConnectionRepository(
+                availability = isInternetAvailable,
+            ),
+        ),
         observeFavoriteMovieIdsUseCase = ObserveFavoriteMovieIdsUseCase(
             repository = favoriteRepository,
         ),
@@ -163,6 +192,12 @@ class TrailerDetailsViewModelTest {
         views = views,
         resource = null,
     )
+}
+
+private class FakeInternetConnectionRepository(
+    private val availability: MutableStateFlow<Boolean>,
+) : InternetConnectionRepository.Local {
+    override fun observeAvailability(): Flow<Boolean> = availability
 }
 
 private class FakeFavoriteRepository(

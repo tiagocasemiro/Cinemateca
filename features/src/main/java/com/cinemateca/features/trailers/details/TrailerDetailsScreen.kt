@@ -3,18 +3,27 @@ package com.cinemateca.features.trailers.details
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.components.OfflineContent
 import com.cinemateca.features.trailers.details.components.TrailerDetailsBackground
 import com.cinemateca.features.trailers.details.components.TrailerDetailsContent
 import com.cinemateca.features.trailers.details.components.TrailerDetailsError
 import com.cinemateca.features.trailers.details.components.TrailerDetailsLoading
+import com.cinemateca.features.trailers.details.components.GlassIconButton
 
 @Composable
 fun TrailerDetailsScreen(
@@ -36,6 +45,28 @@ fun TrailerDetailsScreen(
         )
 
         when {
+            uiState.isOffline -> OfflineContent(
+                onRetry = {
+                    onAction(TrailerDetailsUiAction.Retry)
+                },
+            ) {
+                GlassIconButton(
+                    contentDescription = "Voltar",
+                    onClick = onBackClick,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .statusBarsPadding()
+                        .padding(start = 19.dp, top = 12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(21.dp),
+                    )
+                }
+            }
+
             uiState.details != null -> TrailerDetailsContent(
                 details = uiState.details,
                 onBackClick = onBackClick,
@@ -69,6 +100,29 @@ fun TrailerDetailsScreen(
                 modifier = Modifier.align(Alignment.Center),
             )
         }
+    }
+}
+
+@Preview(
+    name = "Detalhes do trailer - Sem conexão",
+    showBackground = true,
+    widthDp = 378,
+    heightDp = 844,
+)
+@Composable
+private fun TrailerDetailsOfflinePreview() {
+    CinematecaTheme {
+        TrailerDetailsScreen(
+            uiState = TrailerDetailsUiState(
+                isLoading = false,
+                isOffline = true,
+            ),
+            onAction = {},
+            onBackClick = {},
+            onShareClick = {},
+            onYouTubeClick = {},
+            onPromotionalVideoClick = {},
+        )
     }
 }
 

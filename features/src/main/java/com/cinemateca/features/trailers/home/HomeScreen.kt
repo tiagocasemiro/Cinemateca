@@ -19,12 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.components.OfflineContent
 import com.cinemateca.features.trailers.home.components.HomeContent
 import com.cinemateca.features.trailers.home.components.HomeErrorContent
 import com.cinemateca.features.trailers.home.components.HomeFilters
 import com.cinemateca.features.trailers.home.components.HomeHeader
 import com.cinemateca.features.trailers.home.components.HomeLoadingContent
-import com.cinemateca.features.trailers.home.components.HomeOfflineContent
 import com.cinemateca.features.trailers.home.components.HomeSortBottomSheet
 
 @Composable
@@ -79,7 +79,7 @@ fun HomeScreen(
                 .background(CinematecaColors.Background),
         ) {
             when {
-                uiState.isOffline -> HomeOfflineContent(
+                uiState.isOffline -> OfflineContent(
                     onRetry = {
                         onAction(HomeUiAction.Retry)
                     },

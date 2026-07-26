@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Loading
 import com.cinemateca.domain.Success
+import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
 import com.cinemateca.domain.movies.model.Movie
 import com.cinemateca.domain.movies.model.MediaResourceType
 import com.cinemateca.domain.movies.usecase.GetMovieByKinoCheckIdUseCase
@@ -18,6 +19,7 @@ import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.navigation.TrailerDetailsRoute
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +31,7 @@ import kotlinx.coroutines.launch
 class TrailerDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val getMovieByKinoCheckIdUseCase: GetMovieByKinoCheckIdUseCase,
+    private val observeInternetConnectionUseCase: ObserveInternetConnectionUseCase,
     private val observeFavoriteMovieIdsUseCase: ObserveFavoriteMovieIdsUseCase,
     private val observeWatchlistMovieIdsUseCase: ObserveWatchlistMovieIdsUseCase,
     private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
@@ -40,10 +43,12 @@ class TrailerDetailsViewModel(
 
     private var favoriteMovieIds: Set<String> = emptySet()
     private var watchlistMovieIds: Set<String> = emptySet()
+    private var loadDetailsJob: Job? = null
+    private var hasRequestedInitialLoad = false
 
     init {
         observeMovieSelections()
-        loadDetails()
+        observeInternetConnection()
     }
 
     fun onAction(action: TrailerDetailsUiAction) {
@@ -80,7 +85,10 @@ class TrailerDetailsViewModel(
     }
 
     private fun loadDetails() {
-        viewModelScope.launch {
+        if (mutableUiState.value.isOffline) return
+        if (loadDetailsJob?.isActive == true) return
+
+        loadDetailsJob = viewModelScope.launch {
             mutableUiState.update {
                 it.copy(isLoading = true, errorMessage = null)
             }
@@ -126,6 +134,42 @@ class TrailerDetailsViewModel(
                     it.copy(isLoading = false)
                 }
             }
+        }
+    }
+
+    private fun observeInternetConnection() {
+        viewModelScope.launch {
+            observeInternetConnectionUseCase()
+                .catch { throwable ->
+                    if (throwable is CancellationException) throw throwable
+                    emit(false)
+                }
+                .collect { isAvailable ->
+                    val wasOffline = mutableUiState.value.isOffline
+
+                    mutableUiState.update {
+                        it.copy(
+                            isOffline = !isAvailable,
+                            isLoading = if (isAvailable) {
+                                it.isLoading
+                            } else {
+                                false
+                            },
+                            errorMessage = if (isAvailable) {
+                                it.errorMessage
+                            } else {
+                                null
+                            },
+                        )
+                    }
+
+                    if (!isAvailable) {
+                        loadDetailsJob?.cancel()
+                    } else if (!hasRequestedInitialLoad || wasOffline) {
+                        hasRequestedInitialLoad = true
+                        loadDetails()
+                    }
+                }
         }
     }
 

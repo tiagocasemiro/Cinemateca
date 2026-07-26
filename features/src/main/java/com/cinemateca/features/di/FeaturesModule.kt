@@ -10,6 +10,7 @@ val featuresModule = module {
         TrailerDetailsViewModel(
             savedStateHandle = get(),
             getMovieByKinoCheckIdUseCase = get(),
+            observeInternetConnectionUseCase = get(),
             observeFavoriteMovieIdsUseCase = get(),
             observeWatchlistMovieIdsUseCase = get(),
             toggleFavoriteMovieUseCase = get(),

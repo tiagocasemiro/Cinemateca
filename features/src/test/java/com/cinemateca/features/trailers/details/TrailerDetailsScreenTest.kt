@@ -83,6 +83,40 @@ class TrailerDetailsScreenTest {
     }
 
     @Test
+    fun `renders offline state and forwards its actions`() {
+        val callbacks = mutableListOf<String>()
+        composeRule.setContent {
+            CinematecaTheme {
+                TrailerDetailsScreen(
+                    uiState = TrailerDetailsUiState(
+                        isLoading = false,
+                        isOffline = true,
+                    ),
+                    onAction = { callbacks += it.toString() },
+                    onBackClick = { callbacks += "back" },
+                    onShareClick = {},
+                    onYouTubeClick = {},
+                    onPromotionalVideoClick = {},
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription("Sem conexão com a internet")
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Sem conexão").assertIsDisplayed()
+        composeRule.onNodeWithText("Tentar novamente").performClick()
+        composeRule
+            .onNodeWithContentDescription("Voltar")
+            .performClick()
+
+        assertEquals(
+            listOf(TrailerDetailsUiAction.Retry.toString(), "back"),
+            callbacks,
+        )
+    }
+
+    @Test
     fun `forwards header and trailer action clicks`() {
         val callbacks = mutableListOf<String>()
         composeRule.setContent {
