@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +40,8 @@ internal fun OfflineContent(
     centerContent: Boolean = false,
     topContent: @Composable BoxScope.() -> Unit = {},
 ) {
+    val offlineDescription = stringResource(R.string.offline_icon_description)
+
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val topPadding = if (maxHeight >= 360.dp) 76.dp else 0.dp
         val contentModifier = if (centerContent) {
@@ -73,7 +76,7 @@ internal fun OfflineContent(
                 modifier = Modifier
                     .size(76.dp)
                     .semantics {
-                        contentDescription = "Sem conexão com a internet"
+                        contentDescription = offlineDescription
                     },
             ) {
                 Image(
@@ -89,7 +92,7 @@ internal fun OfflineContent(
             Spacer(modifier = Modifier.height(19.dp))
 
             Text(
-                text = "Sem conexão",
+                text = stringResource(R.string.offline_title),
                 color = CinematecaColors.OnBackground,
                 fontSize = 19.sp,
                 lineHeight = 29.sp,
@@ -99,7 +102,7 @@ internal fun OfflineContent(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-                text = "Verifique sua conexão e tente novamente.",
+                text = stringResource(R.string.offline_message),
                 color = CinematecaColors.SecondaryText,
                 fontSize = 17.sp,
                 lineHeight = 24.sp,
@@ -118,7 +121,7 @@ internal fun OfflineContent(
                     modifier = Modifier.padding(horizontal = 24.dp),
                 ) {
                     Text(
-                        text = "Tentar novamente",
+                        text = stringResource(R.string.action_retry),
                         color = Color.White,
                         fontSize = 17.sp,
                         lineHeight = 24.sp,

@@ -17,8 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.UiText
+import com.cinemateca.features.designsystem.asString
 import com.cinemateca.features.designsystem.components.OfflineContent
 import com.cinemateca.features.trailers.home.components.HomeContent
 import com.cinemateca.features.trailers.home.components.HomeErrorContent
@@ -62,7 +66,7 @@ fun HomeScreen(
                 uiState.isOffline ||
                     (uiState.isLoading && uiState.trailers.isEmpty())
             },
-            sortOptionLabel = uiState.sortOption.label,
+            sortOptionLabel = stringResource(uiState.sortOption.labelResource),
             selectedFilter = uiState.filterOption,
             onFilterClick = { option ->
                 onAction(HomeUiAction.SelectFilterOption(option))
@@ -99,7 +103,7 @@ fun HomeScreen(
                 uiState.isLoading -> HomeLoadingContent()
 
                 uiState.errorMessage != null -> HomeErrorContent(
-                    message = uiState.errorMessage,
+                    message = uiState.errorMessage.asString(),
                     onRetry = {
                         onAction(HomeUiAction.Retry)
                     },
@@ -107,7 +111,7 @@ fun HomeScreen(
                 )
 
                 else -> Text(
-                    text = "Nenhum filme em alta no momento.",
+                    text = stringResource(R.string.home_empty_message),
                     color = Color.White.copy(alpha = 0.5f),
                     modifier = Modifier.align(Alignment.Center),
                 )
@@ -136,8 +140,8 @@ private val previewTrailers = listOf(
         resourceType = "movie",
         title = "Transformers: O Início",
         thumbnailUrl = null,
-        genres = "Ficção Científica / Ação",
-        published = "Novembro 2024",
+        genres = UiText.Dynamic("Ficção Científica / Ação"),
+        published = UiText.Dynamic("Novembro 2024"),
         isFavorite = true,
         isWatchlisted = true,
     ),
@@ -147,8 +151,8 @@ private val previewTrailers = listOf(
         resourceType = "movie",
         title = "Deadpool & Wolverine",
         thumbnailUrl = null,
-        genres = "Ação / Comédia",
-        published = "25 Jul 2024",
+        genres = UiText.Dynamic("Ação / Comédia"),
+        published = UiText.Dynamic("25 Jul 2024"),
     ),
     HomeTrailerItemUiModel(
         id = "wicked",
@@ -156,8 +160,8 @@ private val previewTrailers = listOf(
         resourceType = "movie",
         title = "Wicked",
         thumbnailUrl = null,
-        genres = "Musical / Drama",
-        published = "22 Nov 2024",
+        genres = UiText.Dynamic("Musical / Drama"),
+        published = UiText.Dynamic("22 Nov 2024"),
     ),
 )
 
@@ -208,7 +212,7 @@ private fun HomeErrorPreview() {
     CinematecaTheme {
         HomeScreen(
             uiState = HomeUiState(
-                errorMessage = "Não foi possível carregar os filmes.",
+                errorMessage = UiText.Resource(R.string.home_default_error),
             ),
             onAction = {},
         )

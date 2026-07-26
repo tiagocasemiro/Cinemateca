@@ -15,6 +15,8 @@ import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
 import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
 import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.Trailer
+import com.cinemateca.features.R
+import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.features.trailers.home.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -57,9 +59,23 @@ class TrailerDetailsViewModelTest {
         assertFalse(state.isLoading)
         assertEquals("Movie title", state.details?.title)
         assertEquals("video-2", state.details?.trailerId)
-        assertEquals("2.5M", state.details?.views)
-        assertEquals("2 trailers", state.details?.videoCount)
-        assertEquals("25 Jul 2026", state.details?.published)
+        assertEquals(
+            UiText.resource(R.string.compact_millions, "2.5"),
+            state.details?.views,
+        )
+        assertEquals(
+            UiText.plural(R.plurals.trailer_count, 2, 2),
+            state.details?.videoCount,
+        )
+        assertEquals(
+            UiText.resource(
+                R.string.display_date,
+                25,
+                UiText.Resource(R.string.month_july_short),
+                "2026",
+            ),
+            state.details?.published,
+        )
         assertEquals("youtube-2", state.details?.youtubeVideoId)
         assertEquals(
             "video-2",
@@ -100,7 +116,7 @@ class TrailerDetailsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "Falha no detalhe",
+            UiText.Resource(R.string.details_default_error),
             viewModel.uiState.value.errorMessage,
         )
     }

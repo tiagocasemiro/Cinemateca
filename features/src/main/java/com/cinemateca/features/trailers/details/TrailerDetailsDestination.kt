@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.cinemateca.features.R
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -33,7 +34,7 @@ fun TrailerDetailsDestination(
                             "${uiState.details?.title.orEmpty()}\n$url",
                         )
                     },
-                    "Compartilhar trailer",
+                    context.getString(R.string.action_share_trailer),
                 )
                 context.startActivity(intent)
             }

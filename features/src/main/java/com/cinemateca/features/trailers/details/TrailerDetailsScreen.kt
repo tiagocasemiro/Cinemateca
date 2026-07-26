@@ -14,10 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.UiText
+import com.cinemateca.features.designsystem.asString
 import com.cinemateca.features.designsystem.components.OfflineContent
 import com.cinemateca.features.trailers.details.components.TrailerDetailsBackground
 import com.cinemateca.features.trailers.details.components.TrailerDetailsContent
@@ -52,7 +56,7 @@ fun TrailerDetailsScreen(
                 centerContent = true,
             ) {
                 GlassIconButton(
-                    contentDescription = "Voltar",
+                    contentDescription = stringResource(R.string.action_back),
                     onClick = onBackClick,
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -87,7 +91,7 @@ fun TrailerDetailsScreen(
             )
 
             uiState.errorMessage != null -> TrailerDetailsError(
-                message = uiState.errorMessage,
+                message = uiState.errorMessage.asString(),
                 onBackClick = onBackClick,
                 onRetry = {
                     onAction(TrailerDetailsUiAction.Retry)
@@ -96,7 +100,7 @@ fun TrailerDetailsScreen(
             )
 
             else -> Text(
-                text = "Trailer indisponível.",
+                text = stringResource(R.string.details_unavailable),
                 color = Color.White.copy(alpha = 0.6f),
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -164,26 +168,36 @@ private fun TrailerDetailsScreenPreview() {
                     trailerId = "official",
                     title = "Deadpool & Wolverine",
                     thumbnailUrl = null,
-                    topBadge = "Trailer",
-                    views = "3.1M",
-                    videoCount = "12 trailers",
-                    published = "25 Jul 2024",
+                    topBadge = UiText.Resource(
+                        R.string.details_default_badge,
+                    ),
+                    views = UiText.Dynamic("3.1M"),
+                    videoCount = UiText.plural(
+                        R.plurals.trailer_count,
+                        12,
+                        12,
+                    ),
+                    published = UiText.Dynamic("25 Jul 2024"),
                     tags = listOf("#ação", "#comédia", "#inglês"),
-                    description = "Wade Wilson recruta um relutante Wolverine " +
-                        "para uma missão épica que envolve o multiverso.",
+                    description = UiText.Dynamic(
+                        "Wade Wilson recruta um relutante Wolverine " +
+                            "para uma missão épica que envolve o multiverso.",
+                    ),
                     promotionalVideos = listOf(
                         PromotionalVideoUiModel(
                             id = "official",
                             title = "Trailer oficial — Deadpool & Wolverine",
                             thumbnailUrl = null,
-                            subtitle = "Trailer",
+                            subtitle = UiText.Resource(
+                                R.string.details_default_badge,
+                            ),
                             youtubeVideoId = "official",
                         ),
                         PromotionalVideoUiModel(
                             id = "teaser",
                             title = "Teaser — Deadpool & Wolverine",
                             thumbnailUrl = null,
-                            subtitle = "Teaser",
+                            subtitle = UiText.Dynamic("Teaser"),
                             youtubeVideoId = "teaser",
                         ),
                     ),

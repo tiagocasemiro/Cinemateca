@@ -26,7 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 
 private val SkeletonColor = CinematecaColors.SurfaceElevated.copy(alpha = 0.53f)
@@ -42,13 +44,15 @@ internal fun TrailerDetailsLoading(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val loadingDescription = stringResource(R.string.details_loading)
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(SkeletonBackground)
             .navigationBarsPadding()
             .semantics {
-                contentDescription = "Carregando detalhes do trailer"
+                contentDescription = loadingDescription
             },
     ) {
         LoadingHero(onBackClick = onBackClick)
@@ -73,7 +77,7 @@ private fun LoadingHero(onBackClick: () -> Unit) {
                 .padding(start = 19.dp, top = 12.dp),
         ) {
             GlassIconButton(
-                contentDescription = "Voltar",
+                contentDescription = stringResource(R.string.action_back),
                 onClick = onBackClick,
             ) {
                 Icon(

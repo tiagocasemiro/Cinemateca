@@ -17,6 +17,8 @@ import com.cinemateca.domain.trailers.model.MediaReference
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.model.TrailerPage
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
+import com.cinemateca.features.R
+import com.cinemateca.features.designsystem.UiText
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -89,8 +91,15 @@ class HomeViewModelTest {
                     resourceType = "",
                     title = "Trailer em alta",
                     thumbnailUrl = "https://cdn.kinocheck.com/1.jpg",
-                    genres = "Action",
-                    published = "25 jul. 2026",
+                    genres = UiText.Dynamic("Action"),
+                    published = UiText.resource(
+                        R.string.display_date,
+                        25,
+                        UiText.Resource(
+                            R.string.home_month_july_short,
+                        ),
+                        2026,
+                    ),
                 ),
             ),
             viewModel.uiState.value.trailers,
@@ -183,7 +192,10 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertFalse(viewModel.uiState.value.isLoading)
-        assertEquals("Serviço indisponível", viewModel.uiState.value.errorMessage)
+        assertEquals(
+            UiText.Resource(R.string.home_default_error),
+            viewModel.uiState.value.errorMessage,
+        )
 
         result = Success(trailerPage())
         viewModel.onAction(HomeUiAction.Retry)

@@ -25,10 +25,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
 import com.cinemateca.features.trailers.home.HomeSortOption
@@ -71,7 +73,7 @@ internal fun HomeSortBottomSheet(
         modifier = modifier,
     ) {
         Text(
-            text = "Ordenar por",
+            text = stringResource(R.string.sort_title),
             color = CinematecaColors.SecondaryText,
             fontSize = 17.sp,
             lineHeight = 24.sp,
@@ -106,6 +108,13 @@ private fun SortOptionRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val optionLabel = stringResource(option.labelResource)
+    val optionDescription = if (isSelected) {
+        stringResource(R.string.option_selected, optionLabel)
+    } else {
+        optionLabel
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -118,16 +127,12 @@ private fun SortOptionRow(
             )
             .semantics {
                 role = Role.RadioButton
-                contentDescription = if (isSelected) {
-                    "${option.label}, selecionado"
-                } else {
-                    option.label
-                }
+                contentDescription = optionDescription
             }
             .padding(horizontal = 24.dp),
     ) {
         Text(
-            text = option.label,
+            text = optionLabel,
             color = if (isSelected) {
                 CinematecaColors.Primary
             } else {
@@ -181,7 +186,7 @@ private fun HomeSortBottomSheetPreview() {
                 .padding(top = 14.dp),
         ) {
             Text(
-                text = "Ordenar por",
+                text = stringResource(R.string.sort_title),
                 color = CinematecaColors.SecondaryText,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )

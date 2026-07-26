@@ -14,9 +14,9 @@ import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
 import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
+import com.cinemateca.features.R
+import com.cinemateca.features.designsystem.UiText
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -172,7 +172,9 @@ class HomeViewModel(
             throw cancellation
         } catch (_: Throwable) {
             mutableUiState.update {
-                it.copy(errorMessage = SELECTION_ERROR_MESSAGE)
+                it.copy(
+                    errorMessage = UiText.Resource(R.string.selection_error),
+                )
             }
         }
     }
@@ -244,10 +246,9 @@ class HomeViewModel(
 
                     is Failure -> mutableUiState.update {
                         it.copy(
-                            errorMessage = result.error
-                                ?.formattedMessage
-                                .orEmpty()
-                                .ifBlank { DEFAULT_ERROR_MESSAGE },
+                            errorMessage = UiText.Resource(
+                                R.string.home_default_error,
+                            ),
                         )
                     }
 
@@ -257,7 +258,11 @@ class HomeViewModel(
                 throw cancellation
             } catch (_: Throwable) {
                 mutableUiState.update {
-                    it.copy(errorMessage = DEFAULT_ERROR_MESSAGE)
+                    it.copy(
+                        errorMessage = UiText.Resource(
+                            R.string.home_default_error,
+                        ),
+                    )
                 }
             } finally {
                 mutableUiState.update {
@@ -267,12 +272,6 @@ class HomeViewModel(
         }
     }
 
-    private companion object {
-        const val DEFAULT_ERROR_MESSAGE =
-            "Não foi possível carregar os trailers em alta."
-        const val SELECTION_ERROR_MESSAGE =
-            "Não foi possível salvar sua seleção."
-    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -305,7 +304,7 @@ private fun List<Trailer>.toUiModels(
         }
 
         HomeSortOption.Alphabetical -> filteredTrailers.sortedBy {
-            it.title.lowercase(Locale.forLanguageTag("pt-BR"))
+            it.title.lowercase()
         }
     }
 
@@ -355,30 +354,58 @@ private fun Trailer.toUiModel(
     resourceType: String,
     isFavorite: Boolean,
     isWatchlisted: Boolean,
-) = HomeTrailerItemUiModel(
+): HomeTrailerItemUiModel {
+    val genresText = genres
+        .ifEmpty { categories }
+        .joinToString(separator = " / ")
+
+    return HomeTrailerItemUiModel(
     id = id,
     movieId = movieId,
     resourceType = resourceType,
     title = title,
     thumbnailUrl = thumbnail ?: youtubeThumbnail,
-    genres = genres
-        .ifEmpty { categories }
-        .joinToString(separator = " / ")
-        .ifBlank { "Gênero não informado" },
+    genres = if (genresText.isBlank()) {
+        UiText.Resource(R.string.genre_unavailable)
+    } else {
+        UiText.Dynamic(genresText)
+    },
     published = published.toDisplayDate(),
     isFavorite = isFavorite,
     isWatchlisted = isWatchlisted,
 )
-
-private fun String?.toDisplayDate(): String {
-    if (isNullOrBlank()) return "Data não informada"
-
-    return runCatching {
-        OffsetDateTime.parse(this).format(
-            DateTimeFormatter.ofPattern(
-                "dd MMM uuuu",
-                Locale.forLanguageTag("pt-BR"),
-            ),
-        )
-    }.getOrDefault(this)
 }
+
+private fun String?.toDisplayDate(): UiText {
+    if (isNullOrBlank()) {
+        return UiText.Resource(R.string.date_unavailable)
+    }
+
+    val date = runCatching {
+        OffsetDateTime.parse(this)
+    }.getOrNull() ?: return UiText.Dynamic(this)
+    val monthResource = MONTH_RESOURCES.getOrNull(date.monthValue - 1)
+        ?: return UiText.Dynamic(this)
+
+    return UiText.resource(
+        R.string.display_date,
+        date.dayOfMonth,
+        UiText.Resource(monthResource),
+        date.year,
+    )
+}
+
+private val MONTH_RESOURCES = listOf(
+    R.string.home_month_january_short,
+    R.string.home_month_february_short,
+    R.string.home_month_march_short,
+    R.string.home_month_april_short,
+    R.string.home_month_may_short,
+    R.string.home_month_june_short,
+    R.string.home_month_july_short,
+    R.string.home_month_august_short,
+    R.string.home_month_september_short,
+    R.string.home_month_october_short,
+    R.string.home_month_november_short,
+    R.string.home_month_december_short,
+)

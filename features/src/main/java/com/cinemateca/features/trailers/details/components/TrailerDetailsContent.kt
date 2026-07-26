@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -56,6 +57,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
+import com.cinemateca.features.designsystem.UiText
+import com.cinemateca.features.designsystem.asString
 import com.cinemateca.features.trailers.details.PromotionalVideoUiModel
 import com.cinemateca.features.trailers.details.TrailerDetailsUiModel
 
@@ -159,7 +162,10 @@ private fun TrailerHero(
     ) {
         AsyncImage(
             model = details.thumbnailUrl,
-            contentDescription = "Imagem de ${details.title}",
+            contentDescription = stringResource(
+                R.string.details_image_description,
+                details.title,
+            ),
             contentScale = ContentScale.Crop,
             error = ColorPainter(Color.White.copy(alpha = 0.05f)),
             fallback = ColorPainter(Color.White.copy(alpha = 0.05f)),
@@ -184,7 +190,7 @@ private fun TrailerHero(
                 .padding(horizontal = ContentPadding, vertical = 12.dp),
         ) {
             GlassIconButton(
-                contentDescription = "Voltar",
+                contentDescription = stringResource(R.string.action_back),
                 onClick = onBackClick,
                 backgroundImageUrl = details.thumbnailUrl,
             ) {
@@ -196,7 +202,9 @@ private fun TrailerHero(
                 )
             }
             GlassIconButton(
-                contentDescription = "Compartilhar trailer",
+                contentDescription = stringResource(
+                    R.string.action_share_trailer,
+                ),
                 onClick = onShareClick,
                 backgroundImageUrl = details.thumbnailUrl,
             ) {
@@ -216,7 +224,7 @@ private fun TrailerHero(
                 .padding(end = 12.dp, bottom = 10.dp),
         ) {
             Text(
-                text = details.topBadge,
+                text = details.topBadge.asString(),
                 color = Color.White,
                 fontSize = 11.sp,
                 lineHeight = 16.sp,
@@ -289,7 +297,13 @@ private fun ActionButtons(
             .padding(horizontal = ContentPadding),
     ) {
         DetailActionButton(
-            text = if (details.isFavorite) "Favoritado" else "Favoritar",
+            text = stringResource(
+                if (details.isFavorite) {
+                    R.string.action_favorited
+                } else {
+                    R.string.action_favorite
+                },
+            ),
             iconResource = if (details.isFavorite) {
                 R.drawable.figma_heart_selected
             } else {
@@ -302,7 +316,13 @@ private fun ActionButtons(
             modifier = Modifier.weight(1f),
         )
         DetailActionButton(
-            text = if (details.isWatchlisted) "Na Lista" else "Quero Assistir",
+            text = stringResource(
+                if (details.isWatchlisted) {
+                    R.string.action_in_watchlist
+                } else {
+                    R.string.action_watchlist
+                },
+            ),
             iconResource = if (details.isWatchlisted) {
                 R.drawable.figma_ticket_selected
             } else {
@@ -391,7 +411,7 @@ private fun DetailsBody(
         StatsRow(details)
         TagsSection(tags = details.tags)
         TextSection(
-            label = "DESCRIÇÃO DO TRAILER",
+            label = stringResource(R.string.details_description_label),
             text = details.description,
         )
         PromotionalMaterials(
@@ -418,7 +438,7 @@ private fun DetailsBody(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Assistir no YouTube",
+                text = stringResource(R.string.details_watch_youtube),
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -434,17 +454,17 @@ private fun StatsRow(details: TrailerDetailsUiModel) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         StatCard(
-            label = "VISUALIZAÇÕES",
+            label = stringResource(R.string.details_views_label),
             value = details.views,
             modifier = Modifier.weight(1f),
         )
         StatCard(
-            label = "VÍDEOS",
+            label = stringResource(R.string.details_videos_label),
             value = details.videoCount,
             modifier = Modifier.weight(1f),
         )
         StatCard(
-            label = "PUBLICADO",
+            label = stringResource(R.string.details_published_label),
             value = details.published,
             modifier = Modifier.weight(1f),
         )
@@ -454,7 +474,7 @@ private fun StatsRow(details: TrailerDetailsUiModel) {
 @Composable
 private fun StatCard(
     label: String,
-    value: String,
+    value: UiText,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -475,7 +495,7 @@ private fun StatCard(
                 maxLines = 1,
             )
             Text(
-                text = value,
+                text = value.asString(),
                 color = Color.White,
                 fontSize = 16.sp,
                 lineHeight = 22.sp,
@@ -491,7 +511,7 @@ private fun StatCard(
 @Composable
 private fun TagsSection(tags: List<String>) {
     Column {
-        SectionLabel(text = "TAGS DO VÍDEO")
+        SectionLabel(text = stringResource(R.string.details_tags_label))
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(top = 9.dp),
@@ -527,12 +547,12 @@ private fun TagsSection(tags: List<String>) {
 @Composable
 private fun TextSection(
     label: String,
-    text: String,
+    text: UiText,
 ) {
     Column {
         SectionLabel(text = label)
         Text(
-            text = text,
+            text = text.asString(),
             color = Color.White.copy(alpha = 0.7f),
             fontSize = 16.sp,
             lineHeight = 27.sp,
@@ -547,7 +567,11 @@ private fun PromotionalMaterials(
     onVideoClick: (String) -> Unit,
 ) {
     Column {
-        SectionLabel(text = "MATERIAIS PROMOCIONAIS")
+        SectionLabel(
+            text = stringResource(
+                R.string.details_promotional_materials_label,
+            ),
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.padding(top = 12.dp),
@@ -626,7 +650,7 @@ private fun PromotionalVideoCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = video.subtitle,
+                    text = video.subtitle.asString(),
                     color = Color.White.copy(alpha = 0.4f),
                     fontSize = 11.sp,
                     lineHeight = 16.sp,
@@ -676,7 +700,7 @@ fun TrailerDetailsError(
                 shape = RoundedCornerShape(14.dp),
             ) {
                 Text(
-                    text = "Voltar",
+                    text = stringResource(R.string.action_back),
                     color = Color.White,
                     modifier = Modifier.padding(
                         horizontal = 20.dp,
@@ -690,7 +714,7 @@ fun TrailerDetailsError(
                 shape = RoundedCornerShape(14.dp),
             ) {
                 Text(
-                    text = "Tentar novamente",
+                    text = stringResource(R.string.action_retry),
                     color = Color.White,
                     modifier = Modifier.padding(
                         horizontal = 20.dp,

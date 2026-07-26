@@ -267,6 +267,8 @@ usos.
   pertencem ao módulo `local`; `app` apenas inclui esse módulo na composição.
 - View não acessa UseCase ou Repository diretamente.
 - ViewModel não acessa Repository diretamente.
+- Toda string estática visível ao usuário está nos recursos Android e é
+  resolvida pela View.
 - DI e Compose Navigation refletem a estrutura final.
 - Assets usados estão previstos nas referências e foram adaptados ao projeto.
 - Cada regra arquitetural aplicável possui teste automatizado ou justificativa

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.UiText
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -177,25 +178,25 @@ class TrailerDetailsScreenTest {
         trailerId = "official",
         title = "Deadpool & Wolverine",
         thumbnailUrl = null,
-        topBadge = "Trailer",
-        views = "3.1M",
-        videoCount = "12 trailers",
-        published = "25 Jul 2024",
+        topBadge = UiText.Dynamic("Trailer"),
+        views = UiText.Dynamic("3.1M"),
+        videoCount = UiText.Dynamic("12 trailers"),
+        published = UiText.Dynamic("25 Jul 2024"),
         tags = listOf("#ação", "#comédia", "#inglês"),
-        description = "Descrição de exemplo.",
+        description = UiText.Dynamic("Descrição de exemplo."),
         promotionalVideos = listOf(
             PromotionalVideoUiModel(
                 id = "official",
                 title = "Trailer oficial — Deadpool & Wolverine",
                 thumbnailUrl = null,
-                subtitle = "Trailer",
+                subtitle = UiText.Dynamic("Trailer"),
                 youtubeVideoId = "youtube-official",
             ),
             PromotionalVideoUiModel(
                 id = "teaser",
                 title = "Teaser — Deadpool & Wolverine",
                 thumbnailUrl = null,
-                subtitle = "Teaser",
+                subtitle = UiText.Dynamic("Teaser"),
                 youtubeVideoId = "youtube-teaser",
             ),
         ),

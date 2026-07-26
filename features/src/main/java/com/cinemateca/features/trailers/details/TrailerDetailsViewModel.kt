@@ -16,6 +16,8 @@ import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
 import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
 import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.Trailer
+import com.cinemateca.features.R
+import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.navigation.TrailerDetailsRoute
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
@@ -114,10 +116,9 @@ class TrailerDetailsViewModel(
 
                     is Failure -> mutableUiState.update {
                         it.copy(
-                            errorMessage = result.error
-                                ?.formattedMessage
-                                .orEmpty()
-                                .ifBlank { DEFAULT_ERROR_MESSAGE },
+                            errorMessage = UiText.Resource(
+                                R.string.details_default_error,
+                            ),
                         )
                     }
 
@@ -127,7 +128,11 @@ class TrailerDetailsViewModel(
                 throw cancellation
             } catch (_: Throwable) {
                 mutableUiState.update {
-                    it.copy(errorMessage = DEFAULT_ERROR_MESSAGE)
+                    it.copy(
+                        errorMessage = UiText.Resource(
+                            R.string.details_default_error,
+                        ),
+                    )
                 }
             } finally {
                 mutableUiState.update {
@@ -206,16 +211,11 @@ class TrailerDetailsViewModel(
             throw cancellation
         } catch (_: Throwable) {
             mutableUiState.update {
-                it.copy(errorMessage = SELECTION_ERROR_MESSAGE)
+                it.copy(
+                    errorMessage = UiText.Resource(R.string.selection_error),
+                )
             }
         }
-    }
-
-    private companion object {
-        const val DEFAULT_ERROR_MESSAGE =
-            "Não foi possível carregar os detalhes deste trailer."
-        const val SELECTION_ERROR_MESSAGE =
-            "Não foi possível salvar sua seleção."
     }
 }
 
@@ -238,9 +238,15 @@ private fun Movie.toUiModel(
         title = displayTitle,
         thumbnailUrl = selectedTrailer.thumbnail
             ?: selectedTrailer.youtubeThumbnail,
-        topBadge = selectedTrailer.categories.firstOrNull() ?: "Trailer",
+        topBadge = selectedTrailer.categories.firstOrNull()
+            ?.let(UiText::Dynamic)
+            ?: UiText.Resource(R.string.details_default_badge),
         views = selectedTrailer.views.toCompactViews(),
-        videoCount = "${allVideos.size} ${if (allVideos.size == 1) "trailer" else "trailers"}",
+        videoCount = UiText.plural(
+            R.plurals.trailer_count,
+            allVideos.size,
+            allVideos.size,
+        ),
         published = selectedTrailer.published.toDisplayDate(),
         tags = selectedTrailer.genres
             .ifEmpty { selectedTrailer.categories }
@@ -248,8 +254,10 @@ private fun Movie.toUiModel(
             .map { tag ->
                 "#${tag.lowercase(Locale.forLanguageTag("pt-BR")).replace(' ', '_')}"
             },
-        description = "Assista ao trailer de $displayTitle e confira " +
-            "os principais destaques desta produção.",
+        description = UiText.resource(
+            R.string.details_description,
+            displayTitle,
+        ),
         promotionalVideos = allVideos
             .sortedByDescending { it.id == selectedTrailer.id }
             .take(5)
@@ -264,49 +272,65 @@ private fun Trailer.toPromotionalVideo() = PromotionalVideoUiModel(
     id = id,
     title = title,
     thumbnailUrl = thumbnail ?: youtubeThumbnail,
-    subtitle = categories.firstOrNull() ?: published.toDisplayDate(),
+    subtitle = categories.firstOrNull()
+        ?.let(UiText::Dynamic)
+        ?: published.toDisplayDate(),
     youtubeVideoId = youtubeVideoId,
 )
 
-private fun Long?.toCompactViews(): String {
-    val value = this ?: return "—"
+private fun Long?.toCompactViews(): UiText {
+    val value = this ?: return UiText.Resource(R.string.not_available_symbol)
     return when {
-        value >= 1_000_000 -> formatCompact(value / 1_000_000.0, "M")
-        value >= 1_000 -> formatCompact(value / 1_000.0, "K")
-        else -> value.toString()
+        value >= 1_000_000 -> UiText.resource(
+            R.string.compact_millions,
+            formatCompact(value / 1_000_000.0),
+        )
+        value >= 1_000 -> UiText.resource(
+            R.string.compact_thousands,
+            formatCompact(value / 1_000.0),
+        )
+        else -> UiText.Dynamic(value.toString())
     }
 }
 
 private fun formatCompact(
     value: Double,
-    suffix: String,
 ): String {
     val formatted = String.format(Locale.US, "%.1f", value)
         .removeSuffix(".0")
-    return "$formatted$suffix"
+    return formatted
 }
 
-private fun String?.toDisplayDate(): String {
-    if (isNullOrBlank()) return "—"
-    val match = DATE_PATTERN.find(this) ?: return this
+private fun String?.toDisplayDate(): UiText {
+    if (isNullOrBlank()) {
+        return UiText.Resource(R.string.not_available_symbol)
+    }
+    val match = DATE_PATTERN.find(this) ?: return UiText.Dynamic(this)
     val (year, month, day) = match.destructured
-    val monthIndex = month.toIntOrNull()?.minus(1) ?: return this
-    val monthName = MONTHS.getOrNull(monthIndex) ?: return this
-    return "${day.toInt()} $monthName $year"
+    val monthIndex = month.toIntOrNull()?.minus(1)
+        ?: return UiText.Dynamic(this)
+    val monthResource = MONTH_RESOURCES.getOrNull(monthIndex)
+        ?: return UiText.Dynamic(this)
+    return UiText.resource(
+        R.string.display_date,
+        day.toInt(),
+        UiText.Resource(monthResource),
+        year,
+    )
 }
 
 private val DATE_PATTERN = Regex("""^(\d{4})-(\d{2})-(\d{2})""")
-private val MONTHS = listOf(
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez",
+private val MONTH_RESOURCES = listOf(
+    R.string.month_january_short,
+    R.string.month_february_short,
+    R.string.month_march_short,
+    R.string.month_april_short,
+    R.string.month_may_short,
+    R.string.month_june_short,
+    R.string.month_july_short,
+    R.string.month_august_short,
+    R.string.month_september_short,
+    R.string.month_october_short,
+    R.string.month_november_short,
+    R.string.month_december_short,
 )

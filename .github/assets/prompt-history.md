@@ -368,3 +368,7 @@ Simplifique bem mais a parte de negocio
 Melhore o flowchart TD use fluxograma mais visual
 
 Atualise as cores dos botões favoritar e quero assistir da home para ficarem com as mesmas cores dos memsmos botões na tela de detalhes
+
+Adicione a skill da pasta .github/skills/architecture a regra que toda string deve ser criada no arquiovo de strings do android
+
+$android-app-architecture Procure migre todas as strings em código para o arquivo de strings

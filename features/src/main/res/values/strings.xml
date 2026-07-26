@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cinemateca</string>
+    <string name="action_back">Voltar</string>
+    <string name="action_retry">Tentar novamente</string>
+    <string name="action_share_trailer">Compartilhar trailer</string>
+
+    <string name="offline_icon_description">Sem conexão com a internet</string>
+    <string name="offline_title">Sem conexão</string>
+    <string name="offline_message">Verifique sua conexão e tente novamente.</string>
+
+    <string name="home_empty_message">Nenhum filme em alta no momento.</string>
+    <string name="home_default_error">Não foi possível carregar os trailers em alta.</string>
+    <string name="selection_error">Não foi possível salvar sua seleção.</string>
+    <string name="genre_unavailable">Gênero não informado</string>
+    <string name="date_unavailable">Data não informada</string>
+    <string name="search_movies">Buscar filmes</string>
+    <string name="search_movies_hint">Buscar filmes…</string>
+    <string name="clear_search">Limpar busca</string>
+    <string name="sort_movies">Ordenar filmes: %1$s</string>
+    <string name="sort_title">Ordenar por</string>
+    <string name="loading_movies">Carregando filmes</string>
+    <string name="filter_selected">Filtro %1$s selecionado</string>
+    <string name="filter_movies_by">Filtrar por %1$s</string>
+    <string name="movie_poster_description">Pôster de %1$s</string>
+    <string name="action_favorite">Favoritar</string>
+    <string name="action_favorited">Favoritado</string>
+    <string name="action_watchlist">Quero Assistir</string>
+    <string name="action_in_watchlist">Na Lista</string>
+    <string name="action_selected">%1$s selecionado</string>
+    <string name="option_selected">%1$s, selecionado</string>
+    <string name="sort_most_recent">Mais Recentes</string>
+    <string name="sort_most_popular">Mais Populares</string>
+    <string name="sort_alphabetical">Ordem Alfabética</string>
+    <string name="filter_all">Todos</string>
+    <string name="filter_now_playing">Em Cartaz</string>
+    <string name="filter_releases">Lançamentos</string>
+    <string name="filter_upcoming">Em Breve</string>
+
+    <plurals name="favorite_count">
+        <item quantity="one">%d favorito</item>
+        <item quantity="other">%d favoritos</item>
+    </plurals>
+    <plurals name="watchlist_count">
+        <item quantity="one">%d quero assistir</item>
+        <item quantity="other">%d quero assistir</item>
+    </plurals>
+    <plurals name="movie_count">
+        <item quantity="one">%d filme</item>
+        <item quantity="other">%d filmes</item>
+    </plurals>
+
+    <string name="details_default_error">Não foi possível carregar os detalhes deste trailer.</string>
+    <string name="details_unavailable">Trailer indisponível.</string>
+    <string name="details_loading">Carregando detalhes do trailer</string>
+    <string name="details_image_description">Imagem de %1$s</string>
+    <string name="details_default_badge">Trailer</string>
+    <string name="details_description">Assista ao trailer de %1$s e confira os principais destaques desta produção.</string>
+    <string name="details_description_label">DESCRIÇÃO DO TRAILER</string>
+    <string name="details_watch_youtube">Assistir no YouTube</string>
+    <string name="details_views_label">VISUALIZAÇÕES</string>
+    <string name="details_videos_label">VÍDEOS</string>
+    <string name="details_published_label">PUBLICADO</string>
+    <string name="details_tags_label">TAGS DO VÍDEO</string>
+    <string name="details_promotional_materials_label">MATERIAIS PROMOCIONAIS</string>
+    <string name="details_movie_without_trailers">Filme sem trailers</string>
+    <string name="not_available_symbol">—</string>
+    <string name="compact_thousands">%1$sK</string>
+    <string name="compact_millions">%1$sM</string>
+    <string name="display_date">%1$d %2$s %3$s</string>
+    <string name="month_january_short">Jan</string>
+    <string name="month_february_short">Fev</string>
+    <string name="month_march_short">Mar</string>
+    <string name="month_april_short">Abr</string>
+    <string name="month_may_short">Mai</string>
+    <string name="month_june_short">Jun</string>
+    <string name="month_july_short">Jul</string>
+    <string name="month_august_short">Ago</string>
+    <string name="month_september_short">Set</string>
+    <string name="month_october_short">Out</string>
+    <string name="month_november_short">Nov</string>
+    <string name="month_december_short">Dez</string>
+    <string name="home_month_january_short">jan.</string>
+    <string name="home_month_february_short">fev.</string>
+    <string name="home_month_march_short">mar.</string>
+    <string name="home_month_april_short">abr.</string>
+    <string name="home_month_may_short">mai.</string>
+    <string name="home_month_june_short">jun.</string>
+    <string name="home_month_july_short">jul.</string>
+    <string name="home_month_august_short">ago.</string>
+    <string name="home_month_september_short">set.</string>
+    <string name="home_month_october_short">out.</string>
+    <string name="home_month_november_short">nov.</string>
+    <string name="home_month_december_short">dez.</string>
+
+    <plurals name="trailer_count">
+        <item quantity="one">%d trailer</item>
+        <item quantity="other">%d trailers</item>
+    </plurals>
+</resources>

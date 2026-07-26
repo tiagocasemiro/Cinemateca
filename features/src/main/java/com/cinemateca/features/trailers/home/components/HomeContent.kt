@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -50,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
+import com.cinemateca.features.designsystem.UiText
+import com.cinemateca.features.designsystem.asString
 import com.cinemateca.features.trailers.home.HomeFilterOption
 import com.cinemateca.features.trailers.home.HomeTrailerItemUiModel
 
@@ -65,6 +69,9 @@ internal fun HomeHeader(
     onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val searchDescription = stringResource(R.string.search_movies)
+    val clearSearchDescription = stringResource(R.string.clear_search)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -104,7 +111,7 @@ internal fun HomeHeader(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = "Cinemateca",
+                    text = stringResource(R.string.app_name),
                     color = CinematecaColors.OnBackground,
                     fontSize = 18.sp,
                     lineHeight = 27.sp,
@@ -120,7 +127,11 @@ internal fun HomeHeader(
                         count = favoriteCount,
                         drawableResource = R.drawable.figma_heart_selected,
                         color = CinematecaColors.Favorite,
-                        contentDescription = "$favoriteCount favoritos",
+                        contentDescription = pluralStringResource(
+                            R.plurals.favorite_count,
+                            favoriteCount,
+                            favoriteCount,
+                        ),
                     )
                 }
                 if (watchlistCount > 0) {
@@ -128,8 +139,11 @@ internal fun HomeHeader(
                         count = watchlistCount,
                         drawableResource = R.drawable.figma_ticket_selected,
                         color = CinematecaColors.Primary,
-                        contentDescription =
-                            "$watchlistCount quero assistir",
+                        contentDescription = pluralStringResource(
+                            R.plurals.watchlist_count,
+                            watchlistCount,
+                            watchlistCount,
+                        ),
                     )
                 }
             }
@@ -168,7 +182,7 @@ internal fun HomeHeader(
                     modifier = Modifier
                         .weight(1f)
                         .semantics {
-                            contentDescription = "Buscar filmes"
+                            contentDescription = searchDescription
                         },
                     decorationBox = { innerTextField ->
                         Box(
@@ -176,7 +190,9 @@ internal fun HomeHeader(
                         ) {
                             if (searchQuery.isEmpty()) {
                                 Text(
-                                    text = "Buscar filmes...",
+                                    text = stringResource(
+                                        R.string.search_movies_hint,
+                                    ),
                                     color = CinematecaColors.TertiaryText,
                                     fontSize = 17.sp,
                                 )
@@ -189,7 +205,7 @@ internal fun HomeHeader(
                     Spacer(modifier = Modifier.width(10.dp))
                     FigmaIcon(
                         drawableResource = R.drawable.figma_close,
-                        contentDescription = "Limpar busca",
+                        contentDescription = clearSearchDescription,
                         modifier = Modifier
                             .size(14.dp)
                             .clickable(
@@ -276,8 +292,9 @@ internal fun HomeFilters(
                 items = HomeFilterOption.entries,
                 key = HomeFilterOption::name,
             ) { option ->
+                val optionLabel = stringResource(option.labelResource)
                 FilterChip(
-                    text = option.label,
+                    text = optionLabel,
                     selected = option == selectedFilter,
                     onClick = {
                         onFilterClick(option)
@@ -298,12 +315,22 @@ internal fun HomeFilters(
                 ),
         ) {
             Text(
-                text = movieCount?.let { "$it filmes" } ?: "—",
+                text = movieCount?.let { count ->
+                    pluralStringResource(
+                        R.plurals.movie_count,
+                        count,
+                        count,
+                    )
+                } ?: stringResource(R.string.not_available_symbol),
                 color = CinematecaColors.TertiaryText,
                 fontSize = 11.sp,
                 lineHeight = 17.sp,
             )
 
+            val sortDescription = stringResource(
+                R.string.sort_movies,
+                sortOptionLabel,
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -312,8 +339,7 @@ internal fun HomeFilters(
                         onClick = onSortClick,
                     )
                     .semantics {
-                        contentDescription =
-                            "Ordenar filmes: $sortOptionLabel"
+                        contentDescription = sortDescription
                         role = Role.Button
                     },
             ) {
@@ -350,6 +376,8 @@ internal fun HomeFilters(
 internal fun HomeLoadingContent(
     modifier: Modifier = Modifier,
 ) {
+    val loadingDescription = stringResource(R.string.loading_movies)
+
     LazyColumn(
         userScrollEnabled = false,
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -357,7 +385,7 @@ internal fun HomeLoadingContent(
         modifier = modifier
             .fillMaxSize()
             .semantics {
-                contentDescription = "Carregando filmes"
+                contentDescription = loadingDescription
             }
             .testTag("home_loading"),
     ) {
@@ -442,6 +470,15 @@ private fun FilterChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val chipDescription = stringResource(
+        if (selected) {
+            R.string.filter_selected
+        } else {
+            R.string.filter_movies_by
+        },
+        text,
+    )
+
     Surface(
         color = if (selected) {
             CinematecaColors.Primary
@@ -464,11 +501,7 @@ private fun FilterChip(
                 onClick = onClick,
             )
             .semantics {
-                contentDescription = if (selected) {
-                    "Filtro $text selecionado"
-                } else {
-                    "Filtrar por $text"
-                }
+                contentDescription = chipDescription
                 role = Role.Button
             },
     ) {
@@ -545,6 +578,9 @@ private fun MovieCard(
     onWatchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val favoriteLabel = stringResource(R.string.action_favorite)
+    val watchlistLabel = stringResource(R.string.action_watchlist)
+
     Surface(
         onClick = onClick,
         color = CinematecaColors.Surface,
@@ -566,7 +602,10 @@ private fun MovieCard(
             ) {
                 AsyncImage(
                     model = trailer.thumbnailUrl,
-                    contentDescription = "Pôster de ${trailer.title}",
+                    contentDescription = stringResource(
+                        R.string.movie_poster_description,
+                        trailer.title,
+                    ),
                     contentScale = ContentScale.Crop,
                     error = ColorPainter(Color.White.copy(alpha = 0.05f)),
                     fallback = ColorPainter(Color.White.copy(alpha = 0.05f)),
@@ -610,7 +649,7 @@ private fun MovieCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 MovieActionButton(
-                    text = "Favoritar",
+                    text = favoriteLabel,
                     drawableResource = if (trailer.isFavorite) {
                         R.drawable.figma_heart_selected
                     } else {
@@ -623,7 +662,7 @@ private fun MovieCard(
                     modifier = Modifier.weight(1f),
                 )
                 MovieActionButton(
-                    text = "Quero Assistir",
+                    text = watchlistLabel,
                     drawableResource = if (trailer.isWatchlisted) {
                         R.drawable.figma_ticket_selected
                     } else {
@@ -643,7 +682,7 @@ private fun MovieCard(
 @Composable
 private fun MovieMetadata(
     drawableResource: Int,
-    text: String,
+    text: UiText,
     color: Color,
     modifier: Modifier = Modifier,
 ) {
@@ -658,7 +697,7 @@ private fun MovieMetadata(
         )
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-            text = text,
+            text = text.asString(),
             color = color,
             fontSize = 14.sp,
             lineHeight = 21.sp,
@@ -678,6 +717,8 @@ private fun MovieActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val selectedDescription = stringResource(R.string.action_selected, text)
+
     Surface(
         onClick = onClick,
         color = if (isSelected) {
@@ -699,7 +740,7 @@ private fun MovieActionButton(
             .semantics {
                 selected = isSelected
                 contentDescription = if (isSelected) {
-                    "$text selecionado"
+                    selectedDescription
                 } else {
                     text
                 }
@@ -754,7 +795,7 @@ internal fun HomeErrorContent(
                 containerColor = CinematecaColors.Primary,
             ),
         ) {
-            Text(text = "Tentar novamente")
+            Text(text = stringResource(R.string.action_retry))
         }
     }
 }

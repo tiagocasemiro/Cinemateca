@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.cinemateca.features.designsystem.CinematecaTheme
+import com.cinemateca.features.designsystem.UiText
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -33,9 +34,9 @@ class HomeScreenTest {
         }
 
         composeRule.onNodeWithText("Cinemateca").assertIsDisplayed()
-        composeRule.onNodeWithText("Buscar filmes...").assertIsDisplayed()
+        composeRule.onNodeWithText("Buscar filmes…").assertIsDisplayed()
         composeRule.onNodeWithText("Todos").assertIsDisplayed()
-        composeRule.onNodeWithText("1 filmes").assertIsDisplayed()
+        composeRule.onNodeWithText("1 filme").assertIsDisplayed()
         composeRule.onNodeWithText("Transformers: O Início").assertIsDisplayed()
         composeRule.onNodeWithText("Favoritar").assertIsDisplayed()
         composeRule.onNodeWithText("Quero Assistir").assertIsDisplayed()
@@ -98,7 +99,7 @@ class HomeScreenTest {
             CinematecaTheme {
                 HomeScreen(
                     uiState = HomeUiState(
-                        errorMessage = "Falha ao carregar",
+                        errorMessage = UiText.Dynamic("Falha ao carregar"),
                     ),
                     onAction = actions::add,
                 )
@@ -259,7 +260,7 @@ class HomeScreenTest {
         }
 
         composeRule
-            .onNodeWithContentDescription("1 favoritos")
+            .onNodeWithContentDescription("1 favorito")
             .assertIsDisplayed()
         composeRule
             .onNodeWithContentDescription("1 quero assistir")
@@ -317,7 +318,7 @@ class HomeScreenTest {
         resourceType = "movie",
         title = "Transformers: O Início",
         thumbnailUrl = null,
-        genres = "Ficção Científica / Ação",
-        published = "Novembro 2024",
+        genres = UiText.Dynamic("Ficção Científica / Ação"),
+        published = UiText.Dynamic("Novembro 2024"),
     )
 }

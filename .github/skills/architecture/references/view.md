@@ -5,6 +5,7 @@
 - [Camada](#camada)
 - [Responsabilidades](#responsabilidades)
 - [Convenções obrigatórias](#convenções-obrigatórias)
+- [Recursos de texto](#recursos-de-texto)
 - [Hierarquia de Composables](#hierarquia-de-composables)
 - [Automação](#automação)
 - [Comunicação com ViewModel](#comunicação-com-viewmodel)
@@ -58,6 +59,7 @@ Toda tela Compose pública deve:
    `com.example.app.features.<feature>.<screen>.components`.
 9. Definir rotas tipadas no pacote `com.example.app.navigation`.
 10. Terminar classes e objetos de rota com o sufixo `Route`.
+11. Declarar toda string estática visível ao usuário nos recursos Android.
 
 Usar os seguintes sufixos:
 
@@ -71,6 +73,37 @@ Usar os seguintes sufixos:
 
 Componentes menores devem receber nomes semânticos, como `UserHeader`,
 `RetryButton` ou `AddressCard`. Não adicionar o sufixo genérico `Component`.
+
+## Recursos de texto
+
+Declarar toda string estática exibida ou anunciada ao usuário em
+`src/main/res/values/strings.xml`. Isso inclui textos de botões, títulos,
+rótulos, mensagens, placeholders, diálogos, snackbars e descrições de
+acessibilidade. Não escrever esses textos diretamente em código Kotlin ou em
+composables.
+
+Consumir o recurso na View com `stringResource`:
+
+```xml
+<resources>
+    <string name="user_details_retry">Tentar novamente</string>
+    <string name="user_details_greeting">Olá, %1$s</string>
+</resources>
+```
+
+```kotlin
+Text(text = stringResource(R.string.user_details_retry))
+Text(text = stringResource(R.string.user_details_greeting, user.name))
+```
+
+- Usar recursos formatados para textos com valores dinâmicos.
+- Usar `plurals` e `pluralStringResource` para quantidades.
+- Resolver recursos na View; não passar `Context` para ViewModel, UseCase ou
+  Repository.
+- Não mover para `strings.xml` valores que não são textos de interface, como
+  URLs, chaves de API, identificadores, nomes de rotas e mensagens de log.
+- Executar o Android Lint e corrigir ocorrências de `HardcodedText` no código
+  alterado.
 
 ## Hierarquia de Composables
 
@@ -569,6 +602,7 @@ Testar `Screen` isoladamente passando estado e callbacks:
 - executar ações e verificar callbacks;
 - usar tags somente quando seletores semânticos não forem suficientes;
 - validar conteúdo descritivo e acessibilidade.
+- executar o Android Lint para impedir strings de interface hardcoded.
 
 ### Testes de navegação
 
@@ -594,6 +628,8 @@ grafo de navegação.
 - [ ] Eventos únicos são coletados separadamente do estado.
 - [ ] A `Screen` não recebe ViewModel nem `NavController`.
 - [ ] Componentes específicos ficam no subpacote `components`.
+- [ ] Toda string estática visível ao usuário está em `strings.xml` e é
+  consumida pela View por recurso.
 - [ ] Estado de negócio não é armazenado com `remember`.
 - [ ] Efeitos colaterais não são executados durante recomposição.
 - [ ] Rotas são tipadas e serializáveis.

@@ -17,22 +17,12 @@ suspend fun <T : Any> fetchData(dataProvider: suspend () -> Result<T>): Result<T
         } catch (e: ConnectException) {
             e.printStackTrace()
             Failure(
-                    Error(
-                            code = connectErrorCode,
-                            title = "Falha de conexão",
-                            message =
-                                    "Por favor verifique sua conexão com a internet e tente novamente."
-                    )
+                Error(code = connectErrorCode),
             )
         } catch (e: Exception) {
             e.printStackTrace()
             Failure(
-                    Error(
-                            code = generalErrorCode,
-                            title = "Erro inesperado",
-                            message =
-                                    "Houve um erro inesperado em nossos sistemas, por favor tente novamente mais tarde."
-                    )
+                Error(code = generalErrorCode),
             )
         }
     }

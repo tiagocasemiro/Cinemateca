@@ -1,10 +1,12 @@
 package com.cinemateca.features.trailers.details
 
+import com.cinemateca.features.designsystem.UiText
+
 data class TrailerDetailsUiState(
     val isLoading: Boolean = true,
     val isOffline: Boolean = false,
     val details: TrailerDetailsUiModel? = null,
-    val errorMessage: String? = null,
+    val errorMessage: UiText? = null,
 )
 
 data class TrailerDetailsUiModel(
@@ -12,12 +14,12 @@ data class TrailerDetailsUiModel(
     val trailerId: String,
     val title: String,
     val thumbnailUrl: String?,
-    val topBadge: String,
-    val views: String,
-    val videoCount: String,
-    val published: String,
+    val topBadge: UiText,
+    val views: UiText,
+    val videoCount: UiText,
+    val published: UiText,
     val tags: List<String>,
-    val description: String,
+    val description: UiText,
     val promotionalVideos: List<PromotionalVideoUiModel>,
     val youtubeVideoId: String?,
     val isFavorite: Boolean,
@@ -28,6 +30,6 @@ data class PromotionalVideoUiModel(
     val id: String,
     val title: String,
     val thumbnailUrl: String?,
-    val subtitle: String,
+    val subtitle: UiText,
     val youtubeVideoId: String?,
 )
