@@ -91,3 +91,278 @@ Na tela de detalhe do trailer os botõe voltar e compartilhar estão sem o efeit
 É necessário backgroundImageUrl para configurar o blur ? Porque?
 
 Consegue aplicar o blur direto no fundo transparente ?
+
+Crie um README.md completo e profissional para o projeto Android chamado **Cinemateca**.
+
+O README deve parecer o de um projeto Open Source de alto nível, pronto para ser publicado no GitHub.
+
+Utilize Markdown moderno, organizado e visualmente agradável, com tabelas, badges, callouts, listas, diagramas Mermaid e imagens quando fizer sentido.
+
+O documento deve possuir DUAS VISÕES COMPLETAMENTE DIFERENTES.
+
+=====================================================================
+# 1 - VISÃO DE NEGÓCIO
+=====================================================================
+
+Esta primeira parte deve possuir um tom comercial e de apresentação.
+
+O objetivo é convencer alguém que acabou de chegar ao repositório de que o projeto é bonito, moderno, profissional e muito bem desenvolvido.
+
+Escreva como se estivesse apresentando um produto.
+
+Comece com uma descrição impactante do projeto.
+
+Explique o problema que o aplicativo resolve.
+
+Mostre os diferenciais.
+
+Mostre por que ele é um excelente exemplo de desenvolvimento Android moderno.
+
+Descreva o aplicativo detalhadamente.
+
+Inclua uma seção de funcionalidades extremamente atrativa.
+
+Exemplo:
+
+- Pesquisa instantânea
+- Filmes em cartaz
+- Lançamentos
+- Em breve
+- Favoritos
+- Lista Quero Assistir
+- Tela completa de detalhes
+- Reprodução de trailers
+- Materiais promocionais
+- Recomendações relacionadas
+- Interface Material Design
+- Tema Claro/Escuro
+- Persistência local
+- Navegação fluida
+- Carregamento otimizado
+- Tratamento de erros
+- Estados de Loading
+- Estados vazios
+- Atualização automática
+
+Apresente cada funcionalidade explicando seu benefício para o usuário.
+
+Utilize bastante Markdown.
+
+Use emojis moderadamente.
+
+Inclua badges no topo.
+
+Exemplo:
+
+- Kotlin
+- Jetpack Compose
+- Material Design 3
+- Android
+- MVVM
+- Clean Architecture
+
+Crie uma seção:
+
+## Screenshots
+
+Crie placeholders para imagens.
+
+Exemplo:
+
+![Home](docs/images/home.png)
+
+![Detalhes](docs/images/details.png)
+
+![Trailer](docs/images/trailer.png)
+
+![Favoritos](docs/images/favorites.png)
+
+Mostre as telas organizadas em tabela quando possível.
+
+Crie uma seção:
+
+## Fluxo do aplicativo
+
+Utilize um diagrama Mermaid mostrando a navegação principal.
+
+Mostre também um fluxo resumido da experiência do usuário.
+
+Inclua uma seção:
+
+## Destaques do projeto
+
+Liste os principais pontos fortes.
+
+Por exemplo:
+
+- Arquitetura escalável
+- Código limpo
+- UI moderna
+- Fácil manutenção
+- Fácil evolução
+- Separação de responsabilidades
+- Componentização
+- Alto desempenho
+
+=====================================================================
+# 2 - VISÃO TÉCNICA
+=====================================================================
+
+A segunda parte muda completamente o tom.
+
+Use linguagem objetiva.
+
+Sem marketing.
+
+Escreva como documentação técnica.
+
+Explique detalhadamente como o projeto foi construído.
+
+Inclua as seguintes seções.
+
+# Arquitetura
+
+Explique resumidamente:
+
+- Clean Architecture
+- MVVM
+- Repository Pattern
+- Use Cases
+- StateFlow
+- UI State
+- Navigation
+- Injeção de Dependência
+- Camadas do projeto
+
+Inclua um diagrama Mermaid mostrando o fluxo:
+
+UI
+↓
+ViewModel
+↓
+UseCase
+↓
+Repository
+↓
+Remote Data Source
+↓
+KinoCheck API
+
+Mostre também a estrutura de pastas.
+
+Exemplo
+
+app/
+
+core/
+
+data/
+
+domain/
+
+presentation/
+
+designsystem/
+
+navigation/
+
+di/
+
+util/
+
+Explique rapidamente a responsabilidade de cada módulo.
+
+# Tecnologias utilizadas
+
+Crie uma tabela contendo:
+
+- Kotlin
+- Jetpack Compose
+- Material Design 3
+- Kotlin Coroutines
+- Flow / StateFlow
+- ViewModel
+- Navigation Compose
+- Hilt/Koin (conforme utilizado)
+- Coil
+- Retrofit
+- OkHttp
+- Kotlin Serialization ou Moshi/Gson
+- Paging 3 (caso utilizado)
+- Room (caso utilizado)
+- DataStore
+- JUnit
+- MockK
+- Turbine
+- Espresso
+- Compose UI Test
+
+# Consumo da API
+
+Explique que o aplicativo utiliza diretamente a API da KinoCheck.
+
+Mostre um pequeno fluxo.
+
+App
+
+↓
+
+Repository
+
+↓
+
+Retrofit
+
+↓
+
+KinoCheck API
+
+Explique rapidamente o tratamento de erros.
+
+# Estrutura do projeto
+
+Mostre a árvore simplificada do projeto.
+
+# Como configurar o ambiente
+
+Explique detalhadamente.
+
+Instalar:
+
+- Android Studio
+- JDK
+- Android SDK
+- Git
+
+Informar versões utilizadas.
+
+Inclua uma tabela para:
+
+Compile SDK
+
+Minimum SDK
+
+Target SDK
+
+Android Gradle Plugin
+
+Gradle
+
+Kotlin
+
+Compose Compiler
+
+Java
+
+JDK
+
+# Como obter o projeto
+
+```bash
+git clone ...
+
+Resuma muito a descrição está muito grande
+
+Simplifique bem mais a parte de negocio
+
+Melhore o flowchart TD use fluxograma mais visual

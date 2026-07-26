@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="720" viewBox="0 0 360 720">
+  <rect width="360" height="720" rx="36" fill="#0A0A0F"/>
+  <rect x="18" y="18" width="324" height="684" rx="26" fill="#13131A" stroke="#4D8EFF" stroke-opacity=".45"/>
+  <circle cx="180" cy="250" r="64" fill="#4D8EFF" fill-opacity=".12"/>
+  <path d="M153 226h54v48h-54zM164 216v68M196 216v68" fill="none" stroke="#4D8EFF" stroke-width="5" stroke-linecap="round"/>
+  <text x="180" y="352" fill="#FFFFFF" font-family="sans-serif" font-size="25" font-weight="700" text-anchor="middle">HOME</text>
+  <text x="180" y="386" fill="#FFFFFF" fill-opacity=".55" font-family="sans-serif" font-size="14" text-anchor="middle">Adicione a captura da Home</text>
+  <text x="180" y="410" fill="#FFFFFF" fill-opacity=".35" font-family="monospace" font-size="12" text-anchor="middle">docs/images/home.svg</text>
+</svg>
