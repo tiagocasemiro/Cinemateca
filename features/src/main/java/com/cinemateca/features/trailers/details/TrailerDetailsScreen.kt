@@ -23,6 +23,7 @@ fun TrailerDetailsScreen(
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
     onYouTubeClick: () -> Unit,
+    onPromotionalVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -46,6 +47,7 @@ fun TrailerDetailsScreen(
                     onAction(TrailerDetailsUiAction.ToggleWatchlist)
                 },
                 onYouTubeClick = onYouTubeClick,
+                onPromotionalVideoClick = onPromotionalVideoClick,
             )
 
             uiState.isLoading -> TrailerDetailsLoading(
@@ -85,6 +87,7 @@ private fun TrailerDetailsLoadingPreview() {
             onBackClick = {},
             onShareClick = {},
             onYouTubeClick = {},
+            onPromotionalVideoClick = {},
         )
     }
 }
@@ -119,12 +122,14 @@ private fun TrailerDetailsScreenPreview() {
                             title = "Trailer oficial — Deadpool & Wolverine",
                             thumbnailUrl = null,
                             subtitle = "Trailer",
+                            youtubeVideoId = "official",
                         ),
                         PromotionalVideoUiModel(
                             id = "teaser",
                             title = "Teaser — Deadpool & Wolverine",
                             thumbnailUrl = null,
                             subtitle = "Teaser",
+                            youtubeVideoId = "teaser",
                         ),
                     ),
                     youtubeVideoId = "example",
@@ -136,6 +141,7 @@ private fun TrailerDetailsScreenPreview() {
             onBackClick = {},
             onShareClick = {},
             onYouTubeClick = {},
+            onPromotionalVideoClick = {},
         )
     }
 }

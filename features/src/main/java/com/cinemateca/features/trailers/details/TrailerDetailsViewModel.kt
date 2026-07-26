@@ -221,6 +221,7 @@ private fun Trailer.toPromotionalVideo() = PromotionalVideoUiModel(
     title = title,
     thumbnailUrl = thumbnail ?: youtubeThumbnail,
     subtitle = categories.firstOrNull() ?: published.toDisplayDate(),
+    youtubeVideoId = youtubeVideoId,
 )
 
 private fun Long?.toCompactViews(): String {

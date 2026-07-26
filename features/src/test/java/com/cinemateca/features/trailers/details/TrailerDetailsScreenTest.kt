@@ -30,6 +30,7 @@ class TrailerDetailsScreenTest {
                     onBackClick = { backClicks++ },
                     onShareClick = {},
                     onYouTubeClick = {},
+                    onPromotionalVideoClick = {},
                 )
             }
         }
@@ -58,6 +59,7 @@ class TrailerDetailsScreenTest {
                     onBackClick = {},
                     onShareClick = {},
                     onYouTubeClick = {},
+                    onPromotionalVideoClick = {},
                 )
             }
         }
@@ -99,6 +101,7 @@ class TrailerDetailsScreenTest {
                     onBackClick = { callbacks += "back" },
                     onShareClick = { callbacks += "share" },
                     onYouTubeClick = { callbacks += "youtube" },
+                    onPromotionalVideoClick = { callbacks += "promo:$it" },
                 )
             }
         }
@@ -115,6 +118,9 @@ class TrailerDetailsScreenTest {
         composeRule.onNodeWithText("Na Lista")
             .assertIsSelected()
             .performClick()
+        composeRule.onNodeWithText("Trailer oficial — Deadpool & Wolverine")
+            .performScrollTo()
+            .performClick()
         composeRule.onNodeWithText("Assistir no YouTube")
             .performScrollTo()
             .performClick()
@@ -125,6 +131,7 @@ class TrailerDetailsScreenTest {
                 "share",
                 TrailerDetailsUiAction.ToggleFavorite.toString(),
                 TrailerDetailsUiAction.ToggleWatchlist.toString(),
+                "promo:youtube-official",
                 "youtube",
             ),
             callbacks,
@@ -148,12 +155,14 @@ class TrailerDetailsScreenTest {
                 title = "Trailer oficial — Deadpool & Wolverine",
                 thumbnailUrl = null,
                 subtitle = "Trailer",
+                youtubeVideoId = "youtube-official",
             ),
             PromotionalVideoUiModel(
                 id = "teaser",
                 title = "Teaser — Deadpool & Wolverine",
                 thumbnailUrl = null,
                 subtitle = "Teaser",
+                youtubeVideoId = "youtube-teaser",
             ),
         ),
         youtubeVideoId = "youtube-id",

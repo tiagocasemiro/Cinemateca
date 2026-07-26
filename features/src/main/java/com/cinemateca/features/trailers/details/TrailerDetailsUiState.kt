@@ -28,4 +28,5 @@ data class PromotionalVideoUiModel(
     val title: String,
     val thumbnailUrl: String?,
     val subtitle: String,
+    val youtubeVideoId: String?,
 )

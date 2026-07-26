@@ -102,6 +102,7 @@ fun TrailerDetailsContent(
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
     onYouTubeClick: () -> Unit,
+    onPromotionalVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -140,6 +141,7 @@ fun TrailerDetailsContent(
         DetailsBody(
             details = details,
             onYouTubeClick = onYouTubeClick,
+            onPromotionalVideoClick = onPromotionalVideoClick,
         )
     }
 }
@@ -359,6 +361,7 @@ private fun DetailActionButton(
 private fun DetailsBody(
     details: TrailerDetailsUiModel,
     onYouTubeClick: () -> Unit,
+    onPromotionalVideoClick: (String) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(19.dp),
@@ -377,6 +380,7 @@ private fun DetailsBody(
         )
         PromotionalMaterials(
             videos = details.promotionalVideos,
+            onVideoClick = onPromotionalVideoClick,
         )
         Button(
             onClick = onYouTubeClick,
@@ -524,6 +528,7 @@ private fun TextSection(
 @Composable
 private fun PromotionalMaterials(
     videos: List<PromotionalVideoUiModel>,
+    onVideoClick: (String) -> Unit,
 ) {
     Column {
         SectionLabel(text = "MATERIAIS PROMOCIONAIS")
@@ -532,7 +537,12 @@ private fun PromotionalMaterials(
             modifier = Modifier.padding(top = 12.dp),
         ) {
             videos.forEach { video ->
-                PromotionalVideoCard(video = video)
+                PromotionalVideoCard(
+                    video = video,
+                    onClick = {
+                        video.youtubeVideoId?.let(onVideoClick)
+                    },
+                )
             }
         }
     }
@@ -541,8 +551,11 @@ private fun PromotionalMaterials(
 @Composable
 private fun PromotionalVideoCard(
     video: PromotionalVideoUiModel,
+    onClick: () -> Unit,
 ) {
     Surface(
+        onClick = onClick,
+        enabled = video.youtubeVideoId != null,
         color = Color(0xFF13131A).copy(alpha = 0.9f),
         shape = CardShape,
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f)),

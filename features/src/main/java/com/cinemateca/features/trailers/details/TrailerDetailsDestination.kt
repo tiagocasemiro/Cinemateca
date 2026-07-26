@@ -45,5 +45,13 @@ fun TrailerDetailsDestination(
                 )
             }
         },
+        onPromotionalVideoClick = { videoId ->
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/watch?v=$videoId"),
+                ),
+            )
+        },
     )
 }
