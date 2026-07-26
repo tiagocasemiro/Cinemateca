@@ -545,13 +545,13 @@ private fun MovieCard(
     modifier: Modifier = Modifier,
 ) {
     Surface(
+        onClick = onClick,
         color = CinematecaColors.Surface,
         shape = CardShape,
         border = BorderStroke(1.dp, CinematecaColors.Outline),
         modifier = modifier
             .fillMaxWidth()
-            .height(197.dp)
-            .clickable(onClick = onClick),
+            .height(197.dp),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(14.dp),
