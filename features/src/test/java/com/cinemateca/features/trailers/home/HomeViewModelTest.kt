@@ -6,6 +6,12 @@ import com.cinemateca.domain.Result
 import com.cinemateca.domain.Success
 import com.cinemateca.domain.connectivity.repository.InternetConnectionRepository
 import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
+import com.cinemateca.domain.movies.repository.FavoriteMovieRepository
+import com.cinemateca.domain.movies.repository.WatchlistMovieRepository
+import com.cinemateca.domain.movies.usecase.ObserveFavoriteMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
+import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.PageMetadata
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.model.TrailerPage
@@ -41,6 +47,14 @@ class HomeViewModelTest {
                 availability = internetAvailability,
             ),
         )
+    private val favoriteMovieIds = MutableStateFlow<Set<String>>(emptySet())
+    private val watchlistMovieIds = MutableStateFlow<Set<String>>(emptySet())
+    private val favoriteRepository = FakeFavoriteMovieRepository(
+        movieIds = favoriteMovieIds,
+    )
+    private val watchlistRepository = FakeWatchlistMovieRepository(
+        movieIds = watchlistMovieIds,
+    )
 
     @Test
     fun `starts with a complete renderable state`() {
@@ -80,6 +94,58 @@ class HomeViewModelTest {
         )
         assertNull(viewModel.uiState.value.errorMessage)
     }
+
+    @Test
+    fun `observes and toggles persisted selections independently by movie`() =
+        runTest {
+            favoriteMovieIds.value = setOf("alpha")
+            watchlistMovieIds.value = setOf("bravo")
+            coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+                trailerPage(
+                    trailers = listOf(
+                        trailer(id = "alpha", title = "Alpha"),
+                        trailer(id = "bravo", title = "Bravo"),
+                    ),
+                ),
+            )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertEquals(1, viewModel.uiState.value.favoriteCount)
+            assertEquals(1, viewModel.uiState.value.watchlistCount)
+            assertTrue(
+                viewModel.uiState.value.trailers
+                    .first { it.id == "alpha" }
+                    .isFavorite,
+            )
+            assertFalse(
+                viewModel.uiState.value.trailers
+                    .first { it.id == "alpha" }
+                    .isWatchlisted,
+            )
+            assertTrue(
+                viewModel.uiState.value.trailers
+                    .first { it.id == "bravo" }
+                    .isWatchlisted,
+            )
+
+            viewModel.onAction(HomeUiAction.ToggleFavorite("alpha"))
+            viewModel.onAction(HomeUiAction.ToggleWatchlist("alpha"))
+            advanceUntilIdle()
+
+            assertFalse("alpha" in favoriteMovieIds.value)
+            assertTrue("alpha" in watchlistMovieIds.value)
+            assertFalse(
+                viewModel.uiState.value.trailers
+                    .first { it.id == "alpha" }
+                    .isFavorite,
+            )
+            assertTrue(
+                viewModel.uiState.value.trailers
+                    .first { it.id == "alpha" }
+                    .isWatchlisted,
+            )
+        }
 
     @Test
     fun `shows domain failure and retries the request`() = runTest {
@@ -376,6 +442,18 @@ class HomeViewModelTest {
     private fun createViewModel() = HomeViewModel(
         getTrendingTrailersUseCase = getTrendingTrailersUseCase,
         observeInternetConnectionUseCase = observeInternetConnectionUseCase,
+        observeFavoriteMovieIdsUseCase = ObserveFavoriteMovieIdsUseCase(
+            repository = favoriteRepository,
+        ),
+        observeWatchlistMovieIdsUseCase = ObserveWatchlistMovieIdsUseCase(
+            repository = watchlistRepository,
+        ),
+        toggleFavoriteMovieUseCase = ToggleFavoriteMovieUseCase(
+            repository = favoriteRepository,
+        ),
+        toggleWatchlistMovieUseCase = ToggleWatchlistMovieUseCase(
+            repository = watchlistRepository,
+        ),
     )
 
     private fun trailerPage(
@@ -417,4 +495,38 @@ private class FakeInternetConnectionRepository(
     private val availability: Flow<Boolean>,
 ) : InternetConnectionRepository.Local {
     override fun observeAvailability(): Flow<Boolean> = availability
+}
+
+private class FakeFavoriteMovieRepository(
+    private val movieIds: MutableStateFlow<Set<String>>,
+) : FavoriteMovieRepository.Local {
+    override fun observeMovieIds(): Flow<Set<String>> = movieIds
+
+    override suspend fun setSelected(
+        movieId: String,
+        isSelected: Boolean,
+    ) {
+        movieIds.value = if (isSelected) {
+            movieIds.value + movieId
+        } else {
+            movieIds.value - movieId
+        }
+    }
+}
+
+private class FakeWatchlistMovieRepository(
+    private val movieIds: MutableStateFlow<Set<String>>,
+) : WatchlistMovieRepository.Local {
+    override fun observeMovieIds(): Flow<Set<String>> = movieIds
+
+    override suspend fun setSelected(
+        movieId: String,
+        isSelected: Boolean,
+    ) {
+        movieIds.value = if (isSelected) {
+            movieIds.value + movieId
+        } else {
+            movieIds.value - movieId
+        }
+    }
 }

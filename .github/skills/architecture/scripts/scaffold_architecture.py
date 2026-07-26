@@ -79,7 +79,7 @@ def parse_args() -> argparse.Namespace:
     repository = subparsers.add_parser(
         "repository",
         parents=[common],
-        help="Generate a Repository contract and remote implementation.",
+        help="Generate a Repository contract and its remote or local implementation.",
     )
     repository.add_argument(
         "--name",
@@ -95,6 +95,17 @@ def parse_args() -> argparse.Namespace:
         "--result-type",
         default="Unit",
         help="Kotlin domain result type. Default: Unit",
+    )
+    repository.add_argument(
+        "--source",
+        choices=("remote", "local"),
+        default="remote",
+        help="Data source and implementation module. Default: remote",
+    )
+    repository.add_argument(
+        "--stream",
+        action="store_true",
+        help="Generate a Flow-returning local query. Valid only with --source local.",
     )
     add_parameters(repository)
 
@@ -266,10 +277,72 @@ def repository_plan(args: argparse.Namespace, root: Path) -> dict[Path, str]:
     feature = validate_package_suffix(args.feature, "feature")
     base = validate_package(args.base_package)
     domain_package = f"{base}.domain.{feature}.repository"
-    adapter_package = f"{base}.networking.adapter"
     parameter_code = render_parameters(parameters)
     signature = f"{operation}({parameter_code})"
 
+    if args.stream and args.source != "local":
+        raise ValueError("--stream is valid only with --source local")
+
+    if args.source == "local":
+        adapter_package = f"{base}.local.adapter"
+        contract_imports = [
+            *(["kotlinx.coroutines.flow.Flow"] if args.stream else []),
+            *extra_imports,
+        ]
+        contract_return = (
+            f"Flow<{result_type}>" if args.stream else result_type
+        )
+        contract_modifier = "" if args.stream else "suspend "
+        contract = (
+            f"package {domain_package}\n\n"
+            + render_imports(contract_imports)
+            + ("\n\n" if contract_imports else "\n")
+            + dedent(
+                f"""\
+                interface {name}Repository {{
+                    interface Local {{
+                        {contract_modifier}fun {signature}: {contract_return}
+                    }}
+                }}
+                """
+            )
+        )
+        local = (
+            f"package {adapter_package}\n\n"
+            + render_imports(
+                [
+                    f"{domain_package}.{name}Repository",
+                    *(["kotlinx.coroutines.flow.Flow"] if args.stream else []),
+                    *extra_imports,
+                ]
+            )
+            + "\n\n"
+            + dedent(
+                f"""\
+                class {name}LocalImpl : {name}Repository.Local {{
+                    override {contract_modifier}fun {signature}: {contract_return} {{
+                        TODO("Inject the Room DAO and map database types to domain types")
+                    }}
+                }}
+                """
+            )
+        )
+        return {
+            source_path(
+                root,
+                "domain",
+                domain_package,
+                f"{name}Repository.kt",
+            ): contract,
+            source_path(
+                root,
+                "local",
+                adapter_package,
+                f"{name}LocalImpl.kt",
+            ): local,
+        }
+
+    adapter_package = f"{base}.networking.adapter"
     contract = (
         f"package {domain_package}\n\n"
         + render_imports([f"{base}.domain.Result", *extra_imports])

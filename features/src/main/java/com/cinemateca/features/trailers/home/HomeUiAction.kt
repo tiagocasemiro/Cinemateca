@@ -12,4 +12,10 @@ sealed interface HomeUiAction {
     data class SearchQueryChanged(
         val query: String,
     ) : HomeUiAction
+    data class ToggleFavorite(
+        val movieId: String,
+    ) : HomeUiAction
+    data class ToggleWatchlist(
+        val movieId: String,
+    ) : HomeUiAction
 }

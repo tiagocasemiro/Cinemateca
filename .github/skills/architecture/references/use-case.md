@@ -179,6 +179,8 @@ Aplicar estas regras:
 
 - Chamar Gateway, Retrofit, Room, DAO ou cache concreto somente dentro da
   implementação do Repository.
+- Resolver `Repository.Local` com uma implementação do módulo `local`; o
+  UseCase e o módulo de domínio nunca dependem desse módulo concreto.
 - Manter no UseCase a decisão entre remoto, local e cache.
 - Retornar imediatamente quando uma falha impedir as próximas etapas.
 - Preservar `Failure.error` como anulável.

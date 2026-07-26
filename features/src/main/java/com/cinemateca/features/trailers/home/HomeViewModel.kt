@@ -8,6 +8,10 @@ import com.cinemateca.domain.Failure
 import com.cinemateca.domain.Loading
 import com.cinemateca.domain.Success
 import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCase
+import com.cinemateca.domain.movies.usecase.ObserveFavoriteMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
+import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.model.Trailer
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
 import java.time.OffsetDateTime
@@ -19,12 +23,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val getTrendingTrailersUseCase: GetTrendingTrailersUseCase,
     private val observeInternetConnectionUseCase: ObserveInternetConnectionUseCase,
+    private val observeFavoriteMovieIdsUseCase: ObserveFavoriteMovieIdsUseCase,
+    private val observeWatchlistMovieIdsUseCase: ObserveWatchlistMovieIdsUseCase,
+    private val toggleFavoriteMovieUseCase: ToggleFavoriteMovieUseCase,
+    private val toggleWatchlistMovieUseCase: ToggleWatchlistMovieUseCase,
 ) : ViewModel() {
 
     private val mutableUiState = MutableStateFlow(HomeUiState())
@@ -33,8 +42,11 @@ class HomeViewModel(
     private var loadTrendingJob: Job? = null
     private var hasRequestedInitialLoad = false
     private var loadedTrailers: List<Trailer> = emptyList()
+    private var favoriteMovieIds: Set<String> = emptySet()
+    private var watchlistMovieIds: Set<String> = emptySet()
 
     init {
+        observeMovieSelections()
         observeInternetConnection()
     }
 
@@ -49,6 +61,8 @@ class HomeViewModel(
                 action.option,
             )
             is HomeUiAction.SearchQueryChanged -> search(action.query)
+            is HomeUiAction.ToggleFavorite -> toggleFavorite(action.movieId)
+            is HomeUiAction.ToggleWatchlist -> toggleWatchlist(action.movieId)
         }
     }
 
@@ -60,6 +74,8 @@ class HomeViewModel(
                     sortOption = option,
                     filterOption = it.filterOption,
                     searchQuery = it.searchQuery,
+                    favoriteMovieIds = favoriteMovieIds,
+                    watchlistMovieIds = watchlistMovieIds,
                 ),
             )
         }
@@ -73,6 +89,8 @@ class HomeViewModel(
                     sortOption = it.sortOption,
                     filterOption = option,
                     searchQuery = it.searchQuery,
+                    favoriteMovieIds = favoriteMovieIds,
+                    watchlistMovieIds = watchlistMovieIds,
                 ),
             )
         }
@@ -86,8 +104,76 @@ class HomeViewModel(
                     sortOption = it.sortOption,
                     filterOption = it.filterOption,
                     searchQuery = query,
+                    favoriteMovieIds = favoriteMovieIds,
+                    watchlistMovieIds = watchlistMovieIds,
                 ),
             )
+        }
+    }
+
+    private fun observeMovieSelections() {
+        viewModelScope.launch {
+            combine(
+                observeFavoriteMovieIdsUseCase(),
+                observeWatchlistMovieIdsUseCase(),
+            ) { favoriteIds, watchlistIds ->
+                favoriteIds to watchlistIds
+            }.catch { throwable ->
+                if (throwable is CancellationException) throw throwable
+                emit(emptySet<String>() to emptySet())
+            }.collect { (favoriteIds, watchlistIds) ->
+                favoriteMovieIds = favoriteIds
+                watchlistMovieIds = watchlistIds
+                mutableUiState.update {
+                    it.copy(
+                        favoriteCount = favoriteIds.size,
+                        watchlistCount = watchlistIds.size,
+                        trailers = loadedTrailers.toUiModels(
+                            sortOption = it.sortOption,
+                            filterOption = it.filterOption,
+                            searchQuery = it.searchQuery,
+                            favoriteMovieIds = favoriteIds,
+                            watchlistMovieIds = watchlistIds,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleFavorite(movieId: String) {
+        viewModelScope.launch {
+            runSelectionChange {
+                toggleFavoriteMovieUseCase(
+                    movieId = movieId,
+                    isCurrentlySelected = movieId in favoriteMovieIds,
+                )
+            }
+        }
+    }
+
+    private fun toggleWatchlist(movieId: String) {
+        viewModelScope.launch {
+            runSelectionChange {
+                toggleWatchlistMovieUseCase(
+                    movieId = movieId,
+                    isCurrentlySelected = movieId in watchlistMovieIds,
+                )
+            }
+        }
+    }
+
+    private suspend fun runSelectionChange(
+        change: suspend () -> Unit,
+    ) {
+        try {
+            change()
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (_: Throwable) {
+            mutableUiState.update {
+                it.copy(errorMessage = SELECTION_ERROR_MESSAGE)
+            }
         }
     }
 
@@ -149,6 +235,8 @@ class HomeViewModel(
                                     sortOption = it.sortOption,
                                     filterOption = it.filterOption,
                                     searchQuery = it.searchQuery,
+                                    favoriteMovieIds = favoriteMovieIds,
+                                    watchlistMovieIds = watchlistMovieIds,
                                 ),
                             )
                         }
@@ -182,6 +270,8 @@ class HomeViewModel(
     private companion object {
         const val DEFAULT_ERROR_MESSAGE =
             "Não foi possível carregar os trailers em alta."
+        const val SELECTION_ERROR_MESSAGE =
+            "Não foi possível salvar sua seleção."
     }
 }
 
@@ -190,6 +280,8 @@ private fun List<Trailer>.toUiModels(
     sortOption: HomeSortOption,
     filterOption: HomeFilterOption,
     searchQuery: String,
+    favoriteMovieIds: Set<String>,
+    watchlistMovieIds: Set<String>,
 ): List<HomeTrailerItemUiModel> {
     val now = OffsetDateTime.now()
     val filteredTrailers = filter { trailer ->
@@ -217,7 +309,12 @@ private fun List<Trailer>.toUiModels(
         }
     }
 
-    return sortedTrailers.map(Trailer::toUiModel)
+    return sortedTrailers.map { trailer ->
+        trailer.toUiModel(
+            isFavorite = trailer.id in favoriteMovieIds,
+            isWatchlisted = trailer.id in watchlistMovieIds,
+        )
+    }
 }
 
 private fun Trailer.matchesFilter(
@@ -250,7 +347,10 @@ private fun Trailer.matchesFilter(
     }
 }
 
-private fun Trailer.toUiModel() = HomeTrailerItemUiModel(
+private fun Trailer.toUiModel(
+    isFavorite: Boolean,
+    isWatchlisted: Boolean,
+) = HomeTrailerItemUiModel(
     id = id,
     title = title,
     thumbnailUrl = thumbnail ?: youtubeThumbnail,
@@ -259,6 +359,8 @@ private fun Trailer.toUiModel() = HomeTrailerItemUiModel(
         .joinToString(separator = " / ")
         .ifBlank { "Gênero não informado" },
     published = published.toDisplayDate(),
+    isFavorite = isFavorite,
+    isWatchlisted = isWatchlisted,
 )
 
 private fun String?.toDisplayDate(): String {

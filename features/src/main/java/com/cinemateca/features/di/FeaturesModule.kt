@@ -9,6 +9,10 @@ val featuresModule = module {
         HomeViewModel(
             getTrendingTrailersUseCase = get(),
             observeInternetConnectionUseCase = get(),
+            observeFavoriteMovieIdsUseCase = get(),
+            observeWatchlistMovieIdsUseCase = get(),
+            toggleFavoriteMovieUseCase = get(),
+            toggleWatchlistMovieUseCase = get(),
         )
     }
 }

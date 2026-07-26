@@ -1,6 +1,7 @@
 package com.cinemateca.features.trailers.home
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -231,6 +232,51 @@ class HomeScreenTest {
                 HomeUiAction.SelectFilterOption(
                     HomeFilterOption.NowPlaying,
                 ),
+            ),
+            actions,
+        )
+    }
+
+    @Test
+    fun `renders Figma selected movie actions and forwards toggles`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        favoriteCount = 1,
+                        watchlistCount = 1,
+                        trailers = listOf(
+                            trailer().copy(
+                                isFavorite = true,
+                                isWatchlisted = true,
+                            ),
+                        ),
+                    ),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription("1 favoritos")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("1 quero assistir")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Favoritar selecionado")
+            .assertIsSelected()
+            .performClick()
+        composeRule
+            .onNodeWithContentDescription("Quero Assistir selecionado")
+            .assertIsSelected()
+            .performClick()
+
+        assertEquals(
+            listOf(
+                HomeUiAction.ToggleFavorite("transformers"),
+                HomeUiAction.ToggleWatchlist("transformers"),
             ),
             actions,
         )

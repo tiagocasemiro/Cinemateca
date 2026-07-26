@@ -6,6 +6,8 @@ data class HomeUiState(
     val sortOption: HomeSortOption = HomeSortOption.MostRecent,
     val filterOption: HomeFilterOption = HomeFilterOption.All,
     val searchQuery: String = "",
+    val favoriteCount: Int = 0,
+    val watchlistCount: Int = 0,
     val trailers: List<HomeTrailerItemUiModel> = emptyList(),
     val errorMessage: String? = null,
 )
@@ -33,4 +35,6 @@ data class HomeTrailerItemUiModel(
     val thumbnailUrl: String?,
     val genres: String,
     val published: String,
+    val isFavorite: Boolean = false,
+    val isWatchlisted: Boolean = false,
 )

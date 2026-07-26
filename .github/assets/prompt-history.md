@@ -53,3 +53,7 @@ Considerenado que um filme fique 3 semanas em cartas e que a data de lancamento 
 O campo de busca com placeholder "Buscar filmes..." deve ser construido com um input. Ao digitar cada letra no input a listagem deve ser filtrada pelo titulo do filme com o termo digitado.
 
 Confira o layout implementado com o layout projetado no figma url: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=7-1092&t=h9eFD3oIOp74GJK6-4 . Se necessario faca os ajustes visuais.
+
+$android-app-architecture ao clicar nos botões "Favoritar" ou "Quero assistir", os botões devem ficar selecionados por filme, como no layout do figma url: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=7-1226&t=h9eFD3oIOp74GJK6-4. Crie 2 tabelas no banco local usando room, para salvar os "favoritos" e os "quero assistir". Ao reiniciar o app esta informação deve ser preservada.
+
+$android-app-architecture a implementação do room com a consulta a banco local ficou no modulo app, enquanto a implementação do acesso a dados remotos ficou no nodulo networking. Crie um modulo para implementação de acesso a dados locais, parecido com o que ja acontece com o acesso a dados remotos. Atualize a skill .github/skills/architecture/SKILL.md e seus arquivos de referencia para sempre criarem acesso local a dados em modulo proprio, seguindo as demais orientações da skill.

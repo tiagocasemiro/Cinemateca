@@ -41,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +62,8 @@ private val PillShape = RoundedCornerShape(50)
 @Composable
 internal fun HomeHeader(
     searchQuery: String,
+    favoriteCount: Int,
+    watchlistCount: Int,
     onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -76,34 +79,62 @@ internal fun HomeHeader(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Surface(
-                color = CinematecaColors.Primary.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(
-                    1.dp,
-                    CinematecaColors.Primary.copy(alpha = 0.25f),
-                ),
-                modifier = Modifier.size(34.dp),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                FigmaIcon(
-                    drawableResource = R.drawable.figma_logo,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(9.dp),
+                Surface(
+                    color = CinematecaColors.Primary.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(
+                        1.dp,
+                        CinematecaColors.Primary.copy(alpha = 0.25f),
+                    ),
+                    modifier = Modifier.size(34.dp),
+                ) {
+                    FigmaIcon(
+                        drawableResource = R.drawable.figma_logo,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(9.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = "Cinemateca",
+                    color = CinematecaColors.OnBackground,
+                    fontSize = 18.sp,
+                    lineHeight = 27.sp,
+                    fontWeight = FontWeight.Bold,
                 )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Text(
-                text = "Cinemateca",
-                color = CinematecaColors.OnBackground,
-                fontSize = 18.sp,
-                lineHeight = 27.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+            ) {
+                if (favoriteCount > 0) {
+                    SelectionCountBadge(
+                        count = favoriteCount,
+                        drawableResource = R.drawable.figma_heart_selected,
+                        color = CinematecaColors.Favorite,
+                        contentDescription = "$favoriteCount favoritos",
+                    )
+                }
+                if (watchlistCount > 0) {
+                    SelectionCountBadge(
+                        count = watchlistCount,
+                        drawableResource = R.drawable.figma_ticket_selected,
+                        color = CinematecaColors.Primary,
+                        contentDescription =
+                            "$watchlistCount quero assistir",
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -172,6 +203,49 @@ internal fun HomeHeader(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SelectionCountBadge(
+    count: Int,
+    drawableResource: Int,
+    color: Color,
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        color = color.copy(alpha = 0.12f),
+        shape = PillShape,
+        border = BorderStroke(
+            width = 1.dp,
+            color = color.copy(alpha = 0.2f),
+        ),
+        modifier = modifier.semantics {
+            this.contentDescription = contentDescription
+        },
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(
+                horizontal = 10.5.dp,
+                vertical = 3.5.dp,
+            ),
+        ) {
+            FigmaIcon(
+                drawableResource = drawableResource,
+                contentDescription = null,
+                modifier = Modifier.size(10.dp),
+            )
+            Text(
+                text = count.toString(),
+                color = color,
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+                fontWeight = FontWeight.Medium,
+            )
         }
     }
 }
@@ -531,13 +605,25 @@ private fun MovieCard(
             ) {
                 MovieActionButton(
                     text = "Favoritar",
-                    drawableResource = R.drawable.figma_heart,
+                    drawableResource = if (trailer.isFavorite) {
+                        R.drawable.figma_heart_selected
+                    } else {
+                        R.drawable.figma_heart
+                    },
+                    isSelected = trailer.isFavorite,
+                    selectedColor = CinematecaColors.Favorite,
                     onClick = onFavoriteClick,
                     modifier = Modifier.weight(1f),
                 )
                 MovieActionButton(
                     text = "Quero Assistir",
-                    drawableResource = R.drawable.figma_ticket,
+                    drawableResource = if (trailer.isWatchlisted) {
+                        R.drawable.figma_ticket_selected
+                    } else {
+                        R.drawable.figma_ticket
+                    },
+                    isSelected = trailer.isWatchlisted,
+                    selectedColor = CinematecaColors.Primary,
                     onClick = onWatchClick,
                     modifier = Modifier.weight(1f),
                 )
@@ -578,15 +664,37 @@ private fun MovieMetadata(
 private fun MovieActionButton(
     text: String,
     drawableResource: Int,
+    isSelected: Boolean,
+    selectedColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         onClick = onClick,
-        color = CinematecaColors.ButtonSurface,
+        color = if (isSelected) {
+            selectedColor.copy(alpha = 0.22f)
+        } else {
+            CinematecaColors.ButtonSurface
+        },
         shape = PillShape,
-        border = BorderStroke(1.dp, CinematecaColors.ButtonOutline),
-        modifier = modifier.height(36.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (isSelected) {
+                selectedColor.copy(alpha = 0.45f)
+            } else {
+                CinematecaColors.ButtonOutline
+            },
+        ),
+        modifier = modifier
+            .height(36.dp)
+            .semantics {
+                selected = isSelected
+                contentDescription = if (isSelected) {
+                    "$text selecionado"
+                } else {
+                    text
+                }
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -601,7 +709,11 @@ private fun MovieActionButton(
             Spacer(modifier = Modifier.width(7.dp))
             Text(
                 text = text,
-                color = CinematecaColors.ButtonText,
+                color = if (isSelected) {
+                    selectedColor
+                } else {
+                    CinematecaColors.ButtonText
+                },
                 fontSize = 13.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.Medium,

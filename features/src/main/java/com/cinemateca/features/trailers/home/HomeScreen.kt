@@ -33,8 +33,6 @@ fun HomeScreen(
     onAction: (HomeUiAction) -> Unit,
     modifier: Modifier = Modifier,
     onTrailerClick: (String) -> Unit = {},
-    onFavoriteClick: (String) -> Unit = {},
-    onWatchClick: (String) -> Unit = {},
 ) {
     var isSortSheetVisible by rememberSaveable {
         mutableStateOf(false)
@@ -49,6 +47,8 @@ fun HomeScreen(
     ) {
         HomeHeader(
             searchQuery = uiState.searchQuery,
+            favoriteCount = uiState.favoriteCount,
+            watchlistCount = uiState.watchlistCount,
             onSearchQueryChange = { query ->
                 onAction(HomeUiAction.SearchQueryChanged(query))
             },
@@ -84,8 +84,12 @@ fun HomeScreen(
                 uiState.trailers.isNotEmpty() -> HomeContent(
                     trailers = uiState.trailers,
                     onTrailerClick = onTrailerClick,
-                    onFavoriteClick = onFavoriteClick,
-                    onWatchClick = onWatchClick,
+                    onFavoriteClick = { movieId ->
+                        onAction(HomeUiAction.ToggleFavorite(movieId))
+                    },
+                    onWatchClick = { movieId ->
+                        onAction(HomeUiAction.ToggleWatchlist(movieId))
+                    },
                 )
 
                 uiState.isLoading -> HomeLoadingContent()
@@ -128,6 +132,8 @@ private val previewTrailers = listOf(
         thumbnailUrl = null,
         genres = "Ficção Científica / Ação",
         published = "Novembro 2024",
+        isFavorite = true,
+        isWatchlisted = true,
     ),
     HomeTrailerItemUiModel(
         id = "deadpool",
@@ -155,7 +161,11 @@ private val previewTrailers = listOf(
 private fun HomeContentPreview() {
     CinematecaTheme {
         HomeScreen(
-            uiState = HomeUiState(trailers = previewTrailers),
+            uiState = HomeUiState(
+                favoriteCount = 1,
+                watchlistCount = 1,
+                trailers = previewTrailers,
+            ),
             onAction = {},
         )
     }

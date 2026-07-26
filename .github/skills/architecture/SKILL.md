@@ -34,7 +34,7 @@ observável forem alterados.
 ### Visão geral da arquitetura
 
 Usar
-[references/architecture-overview.md](references/overview.md)
+[references/overview.md](references/overview.md)
 para validar limites, responsabilidades, módulos, stack e direção das
 dependências.
 
@@ -48,11 +48,13 @@ dependências.
 ### Repository
 
 Usar [references/repository.md](references/repository.md) ao adicionar,
-modificar ou apagar contratos e implementações de Repository, fontes remotas,
-DTOs, mappers, conversão de respostas, tratamento de erros, injeção de
-dependências ou testes da camada de dados.
+modificar ou apagar contratos e implementações de Repository, fontes remotas
+ou locais, DTOs, entidades, DAOs, bancos Room, migrations, mappers, conversão
+de respostas, tratamento de erros, injeção de dependências ou testes da camada
+de dados.
 
 - Ao adicionar: seguir os pacotes, sufixos, contratos e fluxos documentados;
+  criar ou reutilizar um módulo `local` próprio quando houver persistência;
   instalar somente os assets exigidos pelo cenário; usar o scaffold da camada
   apenas para arquivos novos; registrar as dependências e criar testes.
 - Ao modificar: inspecionar o contrato, a implementação, os mappers, os
@@ -171,7 +173,7 @@ Usar esta ordem para rastrear consumidores:
 
 | Camada alterada | Inspeção mínima obrigatória |
 | --- | --- |
-| Repository | UseCases, DI e testes; ViewModels e Views se o resultado observável mudar; testes arquiteturais de Repository e assets |
+| Repository | UseCases, DI e testes; módulos `networking` ou `local` conforme a origem; ViewModels e Views se o resultado observável mudar; testes arquiteturais de Repository e assets |
 | Analytics | Features consumidoras, DI, seleção de trackers por build e testes; assets e dependências de provedores |
 | UseCase | ViewModels consumidores, DI e testes; Views se estado ou comportamento mudar; testes arquiteturais de domínio |
 | ViewModel | Destinations, Screens, DI e testes; testes arquiteturais de apresentação |
@@ -193,6 +195,9 @@ usos.
 3. Usar `scripts/install_assets.py` para copiar templates Kotlin exigidos pela
    referência e `scripts/scaffold_architecture.py` para gerar estruturas
    repetitivas.
+   Quando a origem for Room ou outra persistência local, criar a implementação
+   no módulo `local`; nunca colocar banco, DAO, entidade ou adapter local em
+   `app`.
 4. Executar qualquer automação primeiro com `--dry-run` e revisar todos os
    destinos. Não usar `--force` para criar sobre arquivos existentes.
 5. Completar os `TODOs`, adaptar tipos, ligar DI e navegação e criar testes
@@ -258,6 +263,8 @@ usos.
 
 - Pacotes, nomes e sufixos seguem a referência da camada.
 - A direção das dependências permanece válida.
+- Persistência, Room, DAOs, entidades, migrations, adapters locais e sua DI
+  pertencem ao módulo `local`; `app` apenas inclui esse módulo na composição.
 - View não acessa UseCase ou Repository diretamente.
 - ViewModel não acessa Repository diretamente.
 - DI e Compose Navigation refletem a estrutura final.

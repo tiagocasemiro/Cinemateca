@@ -12,7 +12,7 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 REFERENCES = {
-    "overview": Path("references/architecture-overview.md"),
+    "overview": Path("references/overview.md"),
     "repository": Path("references/repository.md"),
     "usecase": Path("references/use-case.md"),
     "viewmodel": Path("references/view-model.md"),

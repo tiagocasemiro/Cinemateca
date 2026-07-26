@@ -5,6 +5,12 @@ import com.cinemateca.domain.connectivity.usecase.ObserveInternetConnectionUseCa
 import com.cinemateca.domain.movies.usecase.GetMovieByImdbIdUseCase
 import com.cinemateca.domain.movies.usecase.GetMovieByKinoCheckIdUseCase
 import com.cinemateca.domain.movies.usecase.GetMovieByTmdbIdUseCase
+import com.cinemateca.domain.movies.repository.FavoriteMovieRepository
+import com.cinemateca.domain.movies.repository.WatchlistMovieRepository
+import com.cinemateca.domain.movies.usecase.ObserveFavoriteMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ObserveWatchlistMovieIdsUseCase
+import com.cinemateca.domain.movies.usecase.ToggleFavoriteMovieUseCase
+import com.cinemateca.domain.movies.usecase.ToggleWatchlistMovieUseCase
 import com.cinemateca.domain.trailers.usecase.GetLatestTrailersUseCase
 import com.cinemateca.domain.trailers.usecase.GetTrailersUseCase
 import com.cinemateca.domain.trailers.usecase.GetTrendingTrailersUseCase
@@ -28,6 +34,12 @@ class UseCaseModuleTest {
                 module {
                     single<InternetConnectionRepository.Local> {
                         FakeInternetConnectionRepository()
+                    }
+                    single<FavoriteMovieRepository.Local> {
+                        FakeFavoriteMovieRepository()
+                    }
+                    single<WatchlistMovieRepository.Local> {
+                        FakeWatchlistMovieRepository()
                     }
                 },
                 useCaseModule,
@@ -57,10 +69,40 @@ class UseCaseModuleTest {
         koin.get<GetMovieByKinoCheckIdUseCase>()
         koin.get<GetMovieByTmdbIdUseCase>()
         koin.get<GetMovieByImdbIdUseCase>()
+        assertNotSame(
+            koin.get<ObserveFavoriteMovieIdsUseCase>(),
+            koin.get<ObserveFavoriteMovieIdsUseCase>(),
+        )
+        assertNotSame(
+            koin.get<ObserveWatchlistMovieIdsUseCase>(),
+            koin.get<ObserveWatchlistMovieIdsUseCase>(),
+        )
+        koin.get<ToggleFavoriteMovieUseCase>()
+        koin.get<ToggleWatchlistMovieUseCase>()
     }
 }
 
 private class FakeInternetConnectionRepository :
     InternetConnectionRepository.Local {
     override fun observeAvailability(): Flow<Boolean> = flowOf(true)
+}
+
+private class FakeFavoriteMovieRepository :
+    FavoriteMovieRepository.Local {
+    override fun observeMovieIds(): Flow<Set<String>> = flowOf(emptySet())
+
+    override suspend fun setSelected(
+        movieId: String,
+        isSelected: Boolean,
+    ) = Unit
+}
+
+private class FakeWatchlistMovieRepository :
+    WatchlistMovieRepository.Local {
+    override fun observeMovieIds(): Flow<Set<String>> = flowOf(emptySet())
+
+    override suspend fun setSelected(
+        movieId: String,
+        isSelected: Boolean,
+    ) = Unit
 }

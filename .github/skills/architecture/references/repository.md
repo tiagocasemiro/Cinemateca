@@ -5,6 +5,7 @@
 - [Responsabilidades](#responsabilidades)
 - [Convenções obrigatórias](#convenções-obrigatórias)
 - [Fluxo de dados remoto](#fluxo-de-dados-remoto)
+- [Fluxo de dados local](#fluxo-de-dados-local)
 - [Uso dos assets](#uso-dos-assets)
 - [Automação](#automação)
 - [Checklist de Repository](#checklist-de-repository)
@@ -26,21 +27,34 @@ Todo Repository deve cumprir as seguintes regras:
 2. Terminar o nome exatamente com o sufixo `Repository`.
 3. Estar no pacote
    `com.example.app.domain.<feature>.repository`.
-4. Declarar o contrato da fonte remota na interface aninhada `Remote`.
-5. Expor operações remotas como funções `suspend`.
-6. Retornar `Result<T>` do domínio, sem expor `retrofit2.Response`, DTOs ou
-   exceções de infraestrutura.
-7. Implementar o contrato remoto no módulo de network com uma classe cujo nome
+4. Declarar cada contrato de origem na interface aninhada correspondente:
+   `Remote`, `Local` ou `Cache`.
+5. Expor operações pontuais como funções `suspend` e observações contínuas
+   locais como `Flow<T>`.
+6. Retornar somente tipos do domínio, sem expor `retrofit2.Response`, DTOs,
+   DAOs, entidades Room ou exceções de infraestrutura.
+7. Implementar o contrato remoto no módulo `networking` com uma classe cujo nome
    termine em `RemoteImpl`, no pacote de adapters.
 8. Executar a chamada remota e a extração da resposta dentro de `fetchData`.
 9. Registrar a implementação no módulo de injeção de dependências vinculando-a
    ao respectivo contrato `Repository.Remote`.
+10. Implementar o contrato local no módulo Android Library `local`, com uma
+    classe cujo nome termine em `LocalImpl`, no pacote de adapters.
+11. Manter Room, bancos, DAOs, entidades, migrations, adapters locais e a DI
+    correspondente exclusivamente em `local`; `app` apenas inclui o módulo de
+    DI local no composition root.
+12. Registrar a implementação local pelo respectivo contrato
+    `Repository.Local` e mapear entidades para tipos de domínio antes de
+    atravessar a fronteira do módulo.
 
 Usar as seguintes estruturas de pacote:
 
 ```text
 com.example.app.domain.<feature>.repository
 com.example.app.networking.adapter
+com.example.app.local.adapter
+com.example.app.local.database
+com.example.app.local.di
 ```
 
 ### Exemplo válido
@@ -93,6 +107,67 @@ Result<DomainModel>
 ↓
 UseCase / ViewModel
 ```
+
+## Fluxo de dados local
+
+Adotar o seguinte fluxo:
+
+```text
+Room Database / DAO
+↓ Entity, chave ou projeção local
+Local Repository (`LocalImpl`)
+↓ modelo do domínio ou Flow<modelo do domínio>
+Repository.Local
+↓
+UseCase / ViewModel
+```
+
+### Propriedade do módulo local
+
+Criar `:local` como Android Library quando o projeto persistir dados e ainda não
+possuir um módulo equivalente. O módulo deve:
+
+- depender de `:domain`;
+- aplicar KSP e declarar Room runtime, Room KTX e Room compiler;
+- manter testes Room e migrations em seu próprio source set unitário;
+- expor para outros módulos somente implementações dos contratos do domínio e
+  módulos de DI;
+- preservar o nome do arquivo, tabelas, versões e migrations ao mover um banco
+  existente entre módulos.
+
+Remover Room e KSP de `app` quando deixarem de ter outro uso nesse módulo.
+`domain` e `features` nunca dependem de `local`. O módulo `app` pode depender de
+`local` apenas para compor DI e iniciar a aplicação.
+
+### Contrato e implementação local
+
+```kotlin
+interface FavoriteRepository {
+    interface Local {
+        fun observeIds(): Flow<Set<String>>
+        suspend fun setSelected(id: String, selected: Boolean)
+    }
+}
+```
+
+```kotlin
+package com.example.app.local.adapter
+
+class FavoriteLocalImpl(
+    private val dao: FavoriteDao
+) : FavoriteRepository.Local {
+    override fun observeIds(): Flow<Set<String>> =
+        dao.observeIds().map(List<String>::toSet)
+
+    override suspend fun setSelected(id: String, selected: Boolean) {
+        if (selected) dao.insert(FavoriteEntity(id)) else dao.delete(id)
+    }
+}
+```
+
+O DAO e a entidade pertencem a `com.example.app.local.database`. Não retornar
+nenhum deles pelo contrato de domínio. Room já executa queries `suspend` e
+`Flow` fora da main thread; não duplicar `Dispatchers.IO` no UseCase.
 
 ## Uso dos assets
 
@@ -172,6 +247,36 @@ Repetir sem `--dry-run` para gravar. Em seguida:
 
 Usar `--parameter` e `--import` mais de uma vez quando necessário. O gerador não
 altera Gateway, módulo de DI ou arquivos existentes.
+
+### Gerar contrato e implementação local
+
+Usar `--source local` para criar `Repository.Local` no domínio e `LocalImpl` no
+módulo `local`:
+
+```bash
+python3 scripts/scaffold_architecture.py repository \
+  --target-root /caminho/do/projeto \
+  --base-package com.example.app \
+  --feature favorites \
+  --name Favorite \
+  --operation observeIds \
+  --result-type "Set<String>" \
+  --source local \
+  --stream \
+  --dry-run
+```
+
+O comando gera:
+
+```text
+domain/.../domain/favorites/repository/FavoriteRepository.kt
+local/.../local/adapter/FavoriteLocalImpl.kt
+```
+
+Repetir sem `--dry-run` para gravar. Depois criar ou adaptar entidade, DAO,
+database, migration e DI no módulo `local`, injetar o DAO no `LocalImpl`,
+substituir o `TODO` e testar o mapeamento e a persistência. O scaffold não
+inventa schemas Room nem altera arquivos existentes.
 
 ### 1. Definir o contrato do Repository no domínio
 
@@ -367,6 +472,16 @@ interface UserRepository {
 
 O contrato remoto não é `suspend`, expõe um tipo do Retrofit e retorna um DTO.
 
+```kotlin
+package com.example.app
+
+@Entity
+data class FavoriteEntity(@PrimaryKey val id: String)
+```
+
+A entidade está no módulo/pacote de aplicação. Toda declaração Room deve
+pertencer ao módulo e ao pacote `local`.
+
 ## Checklist de Repository
 
 Antes de considerar um Repository válido, verificar:
@@ -376,6 +491,7 @@ Antes de considerar um Repository válido, verificar:
 - [ ] O package pertence ao caminho
   `com.example.app.domain.<feature>.repository`.
 - [ ] O contrato remoto está na interface aninhada `Remote`.
+- [ ] O contrato local está na interface aninhada `Local`.
 - [ ] As operações remotas são `suspend`.
 - [ ] O contrato retorna `Result` do domínio e não expõe `Response` ou DTOs.
 - [ ] A implementação está no módulo de network, no pacote de adapters, e seu
@@ -385,6 +501,13 @@ Antes de considerar um Repository válido, verificar:
 - [ ] A chamada remota e a extração da resposta estão dentro de `fetchData`.
 - [ ] A implementação está registrada na injeção de dependências pelo tipo
   `Repository.Remote`.
+- [ ] `LocalImpl`, Room, DAOs, entidades, migrations e a DI local estão
+  exclusivamente no módulo `local`.
+- [ ] `app` apenas compõe o módulo local e não declara nem importa Room.
+- [ ] A implementação local está registrada pelo tipo `Repository.Local`.
+- [ ] Nenhum DAO ou entidade atravessa a fronteira para domínio ou features.
+- [ ] Operações locais pontuais são `suspend` e observações usam `Flow`.
+- [ ] Testes Room e de migration pertencem ao source set unitário de `local`.
 - [ ] O consumidor trata `Failure.error` como anulável.
 
 ## Origens dos dados

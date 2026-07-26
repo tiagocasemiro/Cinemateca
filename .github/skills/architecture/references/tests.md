@@ -33,7 +33,7 @@ comportamental ou revisão explícita, nunca como regra implicitamente ignorada.
 
 Ler as fontes nesta ordem:
 
-1. [architecture-overview.md](overview.md) para camadas, direção
+1. [overview.md](overview.md) para camadas, direção
    das dependências e stack.
 2. [repository.md](repository.md), [use-case.md](use-case.md),
    [view-model.md](view-model.md) e [view.md](view.md) conforme as camadas
@@ -179,6 +179,19 @@ que a cobre.
 
 Não converter recomendações contextuais em proibições globais. Respeitar
 condições e exceções escritas na referência.
+
+Para a fronteira de dados locais, cobrir explicitamente:
+
+- grafo Gradle: `local` depende de `domain`; `domain` e `features` não dependem
+  de `local`;
+- estrutura: imports e annotations Room, DAOs, entidades, databases,
+  migrations, `LocalImpl` e DI local aparecem somente em `local`;
+- contrato: UseCases dependem de `Repository.Local`, nunca de DAO, entidade ou
+  implementação concreta;
+- compilação: `app` compõe o módulo local sem receber Room como dependência
+  direta;
+- comportamento: persistência, reabertura do banco e migrations são testadas
+  no source set unitário de `local`.
 
 ## Estrutura dos testes
 
@@ -371,6 +384,8 @@ testes arquiteturais das camadas geradas.
 - [ ] Consultas cobrem todo o código de produção e falham para escopo vazio.
 - [ ] Assets são verificados por contrato e comportamento, não por texto integral.
 - [ ] Frameworks são fiscalizados somente conforme decisões registradas.
+- [ ] Room e implementações `LocalImpl` são fiscalizados como propriedade
+  exclusiva do módulo `local`.
 - [ ] Exceções são exatas, justificadas e rastreáveis.
 - [ ] Mensagens de falha apontam para referência e seção de origem.
 - [ ] Testes não dependem da skill em runtime.
