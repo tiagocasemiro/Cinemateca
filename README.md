@@ -34,9 +34,9 @@ organizar filmes em favoritos ou na lista “Quero Assistir”.
 > Imagens temporárias. Substitua os arquivos em `docs/images/` por capturas
 > reais mantendo os mesmos nomes.
 
-| Home | Detalhes |
-| :---: | :---: |
-| ![Home](docs/images/home.svg) | ![Detalhes](docs/images/details.svg) |
+|             Home              |               Detalhes               |
+|:-----------------------------:|:------------------------------------:|
+| ![Home](docs/images/home.png) | ![Detalhes](docs/images/details.png) |
 
 **Fluxo:** Home → Detalhes → YouTube ou navegador.
 
