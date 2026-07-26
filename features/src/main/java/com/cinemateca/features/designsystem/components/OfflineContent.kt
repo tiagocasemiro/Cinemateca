@@ -1,6 +1,7 @@
 package com.cinemateca.features.designsystem.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -35,14 +36,18 @@ private val OfflineShape = RoundedCornerShape(50)
 internal fun OfflineContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    centerContent: Boolean = false,
     topContent: @Composable BoxScope.() -> Unit = {},
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val topPadding = if (maxHeight >= 360.dp) 76.dp else 0.dp
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
+        val contentModifier = if (centerContent) {
+            Modifier
+                .align(Alignment.Center)
+                .fillMaxSize()
+                .padding(horizontal = 29.dp)
+        } else {
+            Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(
@@ -50,7 +55,17 @@ internal fun OfflineContent(
                     top = topPadding,
                     end = 29.dp,
                     bottom = 24.dp,
-                ),
+                )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = if (centerContent) {
+                Arrangement.Center
+            } else {
+                Arrangement.Top
+            },
+            modifier = contentModifier,
         ) {
             Surface(
                 color = CinematecaColors.SurfaceElevated,

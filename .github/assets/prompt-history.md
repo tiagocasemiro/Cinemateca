@@ -81,3 +81,5 @@ Na tela de detalhes click nos materiais promoconais na tela de detalhes não fun
 Adicionar estado  sem conexao na tela de detalhes detalhes
 
 Reultilize o composable de sem conexão da home. O objetivo é padronizar a experiencia e reduzir a quantidade de código
+
+Centralize o conteudo da tela de sem conexão na tela de detalhes

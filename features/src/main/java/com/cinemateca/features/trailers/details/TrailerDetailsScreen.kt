@@ -49,6 +49,7 @@ fun TrailerDetailsScreen(
                 onRetry = {
                     onAction(TrailerDetailsUiAction.Retry)
                 },
+                centerContent = true,
             ) {
                 GlassIconButton(
                     contentDescription = "Voltar",
