@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -134,6 +136,8 @@ internal fun HomeHeader(
 @Composable
 internal fun HomeFilters(
     movieCount: Int?,
+    sortOptionLabel: String,
+    onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -188,6 +192,16 @@ internal fun HomeFilters(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable(
+                        role = Role.Button,
+                        onClick = onSortClick,
+                    )
+                    .semantics {
+                        contentDescription =
+                            "Ordenar filmes: $sortOptionLabel"
+                        role = Role.Button
+                    },
             ) {
                 FigmaIcon(
                     drawableResource = R.drawable.figma_sort,
@@ -196,7 +210,7 @@ internal fun HomeFilters(
                 )
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(
-                    text = "Mais Recentes",
+                    text = sortOptionLabel,
                     color = CinematecaColors.Primary,
                     fontSize = 11.sp,
                     lineHeight = 17.sp,

@@ -151,13 +151,83 @@ class HomeViewModelTest {
             coVerify(exactly = 2) { getTrendingTrailersUseCase(any()) }
         }
 
+    @Test
+    fun `sorts loaded trailers and exposes the selected sort label`() =
+        runTest {
+            coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+                trailerPage(
+                    trailers = listOf(
+                        trailer(
+                            id = "bravo",
+                            title = "Bravo",
+                            published = "2026-07-20T10:00:00-03:00",
+                            views = 10,
+                        ),
+                        trailer(
+                            id = "charlie",
+                            title = "Charlie",
+                            published = "2026-07-26T10:00:00-03:00",
+                            views = 20,
+                        ),
+                        trailer(
+                            id = "alpha",
+                            title = "Alpha",
+                            published = "2026-07-25T10:00:00-03:00",
+                            views = 30,
+                        ),
+                    ),
+                ),
+            )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            assertEquals(
+                listOf("charlie", "alpha", "bravo"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(
+                HomeUiAction.SelectSortOption(
+                    HomeSortOption.MostPopular,
+                ),
+            )
+
+            assertEquals(
+                HomeSortOption.MostPopular,
+                viewModel.uiState.value.sortOption,
+            )
+            assertEquals(
+                listOf("alpha", "charlie", "bravo"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(
+                HomeUiAction.SelectSortOption(
+                    HomeSortOption.Alphabetical,
+                ),
+            )
+
+            assertEquals(
+                listOf("alpha", "bravo", "charlie"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+        }
+
     private fun createViewModel() = HomeViewModel(
         getTrendingTrailersUseCase = getTrendingTrailersUseCase,
         observeInternetConnectionUseCase = observeInternetConnectionUseCase,
     )
 
-    private fun trailerPage() = TrailerPage(
-        trailers = listOf(trailer()),
+    private fun trailerPage(
+        trailers: List<Trailer> = listOf(trailer()),
+    ) = TrailerPage(
+        trailers = trailers,
         metadata = PageMetadata(
             limit = 25,
             page = 1,
@@ -166,19 +236,24 @@ class HomeViewModelTest {
         ),
     )
 
-    private fun trailer() = Trailer(
-        id = "trailer-1",
+    private fun trailer(
+        id: String = "trailer-1",
+        title: String = "Trailer em alta",
+        published: String? = "2026-07-25T10:00:00-03:00",
+        views: Long? = 42,
+    ) = Trailer(
+        id = id,
         youtubeVideoId = "youtube-1",
         youtubeChannelId = "channel-1",
         youtubeThumbnail = "https://img.youtube.com/1",
-        title = "Trailer em alta",
+        title = title,
         url = "https://kinocheck.com/trailer/1",
         thumbnail = "https://cdn.kinocheck.com/1.jpg",
         language = "pt",
         categories = listOf("Trailer"),
         genres = listOf("Action"),
-        published = "2026-07-25T10:00:00-03:00",
-        views = 42,
+        published = published,
+        views = views,
         resource = null,
     )
 }

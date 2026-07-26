@@ -99,6 +99,60 @@ class HomeScreenTest {
         assertEquals(listOf(HomeUiAction.Retry), actions)
     }
 
+    @Test
+    fun `opens sort sheet and forwards the selected option`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription(
+                "Ordenar filmes: Mais Recentes",
+            )
+            .performClick()
+
+        composeRule.onNodeWithText("Ordenar por").assertIsDisplayed()
+        composeRule.onNodeWithText("Mais Populares").performClick()
+
+        assertEquals(
+            listOf(
+                HomeUiAction.SelectSortOption(
+                    HomeSortOption.MostPopular,
+                ),
+            ),
+            actions,
+        )
+    }
+
+    @Test
+    fun `renders the selected sort option beside the sort icon`() {
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        sortOption = HomeSortOption.Alphabetical,
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = {},
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription(
+                "Ordenar filmes: Ordem Alfabética",
+            )
+            .assertIsDisplayed()
+    }
+
     private fun trailer() = HomeTrailerItemUiModel(
         id = "transformers",
         title = "Transformers: O Início",

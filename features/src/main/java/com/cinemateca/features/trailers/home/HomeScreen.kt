@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +25,7 @@ import com.cinemateca.features.trailers.home.components.HomeFilters
 import com.cinemateca.features.trailers.home.components.HomeHeader
 import com.cinemateca.features.trailers.home.components.HomeLoadingContent
 import com.cinemateca.features.trailers.home.components.HomeOfflineContent
+import com.cinemateca.features.trailers.home.components.HomeSortBottomSheet
 
 @Composable
 fun HomeScreen(
@@ -31,6 +36,10 @@ fun HomeScreen(
     onFavoriteClick: (String) -> Unit = {},
     onWatchClick: (String) -> Unit = {},
 ) {
+    var isSortSheetVisible by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -43,6 +52,10 @@ fun HomeScreen(
             movieCount = uiState.trailers.size.takeUnless {
                 uiState.isOffline ||
                     (uiState.isLoading && uiState.trailers.isEmpty())
+            },
+            sortOptionLabel = uiState.sortOption.label,
+            onSortClick = {
+                isSortSheetVisible = true
             },
         )
 
@@ -83,6 +96,19 @@ fun HomeScreen(
                 )
             }
         }
+    }
+
+    if (isSortSheetVisible) {
+        HomeSortBottomSheet(
+            selectedOption = uiState.sortOption,
+            onOptionSelected = { option ->
+                isSortSheetVisible = false
+                onAction(HomeUiAction.SelectSortOption(option))
+            },
+            onDismiss = {
+                isSortSheetVisible = false
+            },
+        )
     }
 }
 

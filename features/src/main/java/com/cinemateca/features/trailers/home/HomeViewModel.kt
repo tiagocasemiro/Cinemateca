@@ -30,6 +30,7 @@ class HomeViewModel(
 
     private var loadTrendingJob: Job? = null
     private var hasRequestedInitialLoad = false
+    private var loadedTrailers: List<Trailer> = emptyList()
 
     init {
         observeInternetConnection()
@@ -40,6 +41,17 @@ class HomeViewModel(
             HomeUiAction.Refresh,
             HomeUiAction.Retry,
             -> loadTrending()
+
+            is HomeUiAction.SelectSortOption -> selectSortOption(action.option)
+        }
+    }
+
+    private fun selectSortOption(option: HomeSortOption) {
+        mutableUiState.update {
+            it.copy(
+                sortOption = option,
+                trailers = loadedTrailers.toUiModels(option),
+            )
         }
     }
 
@@ -93,12 +105,15 @@ class HomeViewModel(
 
             try {
                 when (val result = getTrendingTrailersUseCase()) {
-                    is Success -> mutableUiState.update {
-                        it.copy(
-                            trailers = result.data.trailers.map(
-                                Trailer::toUiModel,
-                            ),
-                        )
+                    is Success -> {
+                        loadedTrailers = result.data.trailers
+                        mutableUiState.update {
+                            it.copy(
+                                trailers = loadedTrailers.toUiModels(
+                                    it.sortOption,
+                                ),
+                            )
+                        }
                     }
 
                     is Failure -> mutableUiState.update {
@@ -130,6 +145,26 @@ class HomeViewModel(
         const val DEFAULT_ERROR_MESSAGE =
             "Não foi possível carregar os trailers em alta."
     }
+}
+
+private fun List<Trailer>.toUiModels(
+    sortOption: HomeSortOption,
+): List<HomeTrailerItemUiModel> {
+    val sortedTrailers = when (sortOption) {
+        HomeSortOption.MostRecent -> sortedByDescending {
+            it.published.orEmpty()
+        }
+
+        HomeSortOption.MostPopular -> sortedByDescending {
+            it.views ?: 0L
+        }
+
+        HomeSortOption.Alphabetical -> sortedBy {
+            it.title.lowercase(Locale.forLanguageTag("pt-BR"))
+        }
+    }
+
+    return sortedTrailers.map(Trailer::toUiModel)
 }
 
 private fun Trailer.toUiModel() = HomeTrailerItemUiModel(
