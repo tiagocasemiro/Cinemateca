@@ -186,6 +186,7 @@ private fun TrailerHero(
             GlassIconButton(
                 contentDescription = "Voltar",
                 onClick = onBackClick,
+                backgroundImageUrl = details.thumbnailUrl,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -197,6 +198,7 @@ private fun TrailerHero(
             GlassIconButton(
                 contentDescription = "Compartilhar trailer",
                 onClick = onShareClick,
+                backgroundImageUrl = details.thumbnailUrl,
             ) {
                 Icon(
                     imageVector = Icons.Default.Share,
@@ -230,6 +232,7 @@ internal fun GlassIconButton(
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundImageUrl: String? = null,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -238,11 +241,23 @@ internal fun GlassIconButton(
             .size(43.dp)
             .clip(CircleShape),
     ) {
+        if (backgroundImageUrl != null) {
+            AsyncImage(
+                model = backgroundImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(
+                        radius = 12.dp,
+                        edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                    ),
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .blur(8.dp)
-                .background(Color.Black.copy(alpha = 0.48f)),
+                .background(Color.Black.copy(alpha = 0.42f)),
         )
         Box(
             contentAlignment = Alignment.Center,

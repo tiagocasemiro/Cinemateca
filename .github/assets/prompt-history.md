@@ -85,3 +85,9 @@ Reultilize o composable de sem conexão da home. O objetivo é padronizar a expe
 Centralize o conteudo da tela de sem conexão na tela de detalhes
 
 Ao clicar nos cards da home ou ao passar o mause em cima, o sombreamento do efeito de click está sem arredondamento.
+
+Na tela de detalhe do trailer os botõe voltar e compartilhar estão sem o efeito blur no background. Adicione.
+
+É necessário backgroundImageUrl para configurar o blur ? Porque?
+
+Consegue aplicar o blur direto no fundo transparente ?
