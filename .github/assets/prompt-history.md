@@ -65,3 +65,13 @@ Atualize as cores do botão de favorito e querro assistir quando selecionados. u
 Na pasta /home/tiagocasemiro/Imagens/cinemateca_launcher_icons voce vai encontrar todos os icones para adicionar ao app. Adicione o icone com todas as configurações recomentadas
 
 Atualize o estado de loading da tela de detalhes https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=13-2171&t=h9eFD3oIOp74GJK6-4
+
+Cire o icone usando Android vector drawable com esse layout https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=14-2254&t=h9eFD3oIOp74GJK6-4. Adicione bordas da cor Color(0xFF4D8EFF)
+
+No meu celular sansumg o icone fica com as bordas cortadas, pq no sansung os icones tem um formato diferente. Em alguns celulares o formato é redondo. ajuste o icone de launch para funcionar bem em todos os formatos
+
+Adicione uma borda azul igual a do app/src/main/res/drawable/ic_launcher.xml no icone app/src/main/res/drawable/ic_launcher_round_background.xml
+
+os 2 icones da pasta app/src/main/res/mipmap estão apresentando erro
+
+Os 2 drawables da pasta mipmap estão dando erro. todos os icones redondos das pastas mipmap estão quadrados.
