@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -616,7 +617,8 @@ private fun MovieCard(
                         R.drawable.figma_heart
                     },
                     isSelected = trailer.isFavorite,
-                    selectedColor = CinematecaColors.Favorite,
+                    selectedContainerColor = CinematecaColors.FavoriteSelectedSurface,
+                    selectedBorderColor = CinematecaColors.FavoriteSelectedOutline,
                     onClick = onFavoriteClick,
                     modifier = Modifier.weight(1f),
                 )
@@ -628,7 +630,8 @@ private fun MovieCard(
                         R.drawable.figma_ticket
                     },
                     isSelected = trailer.isWatchlisted,
-                    selectedColor = CinematecaColors.Primary,
+                    selectedContainerColor = CinematecaColors.WatchlistSelectedSurface,
+                    selectedBorderColor = CinematecaColors.WatchlistSelectedOutline,
                     onClick = onWatchClick,
                     modifier = Modifier.weight(1f),
                 )
@@ -670,24 +673,25 @@ private fun MovieActionButton(
     text: String,
     drawableResource: Int,
     isSelected: Boolean,
-    selectedColor: Color,
+    selectedContainerColor: Color,
+    selectedBorderColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         onClick = onClick,
         color = if (isSelected) {
-            selectedColor.copy(alpha = 0.22f)
+            selectedContainerColor
         } else {
-            CinematecaColors.ButtonSurface
+            CinematecaColors.ActionButtonSurface
         },
         shape = PillShape,
         border = BorderStroke(
             width = 1.dp,
             color = if (isSelected) {
-                selectedColor.copy(alpha = 0.45f)
+                selectedBorderColor
             } else {
-                CinematecaColors.ButtonOutline
+                CinematecaColors.ActionButtonOutline
             },
         ),
         modifier = modifier
@@ -706,16 +710,17 @@ private fun MovieActionButton(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize(),
         ) {
-            FigmaIcon(
-                drawableResource = drawableResource,
+            Icon(
+                painter = painterResource(drawableResource),
                 contentDescription = null,
+                tint = if (isSelected) Color.White else Color.Unspecified,
                 modifier = Modifier.size(12.dp),
             )
             Spacer(modifier = Modifier.width(7.dp))
             Text(
                 text = text,
                 color = if (isSelected) {
-                    selectedColor
+                    Color.White
                 } else {
                     CinematecaColors.ButtonText
                 },

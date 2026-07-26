@@ -366,3 +366,5 @@ Resuma muito a descrição está muito grande
 Simplifique bem mais a parte de negocio
 
 Melhore o flowchart TD use fluxograma mais visual
+
+Atualise as cores dos botões favoritar e quero assistir da home para ficarem com as mesmas cores dos memsmos botões na tela de detalhes

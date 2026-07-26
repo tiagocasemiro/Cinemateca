@@ -332,7 +332,7 @@ private fun DetailActionButton(
         color = if (isSelected) {
             selectedContainerColor
         } else {
-            Color(0xFF3A3A50)
+            CinematecaColors.ActionButtonSurface
         },
         shape = ActionShape,
         border = BorderStroke(
@@ -340,7 +340,7 @@ private fun DetailActionButton(
             if (isSelected) {
                 selectedBorderColor
             } else {
-                Color(0xFF55556A)
+                CinematecaColors.ActionButtonOutline
             },
         ),
         modifier = modifier

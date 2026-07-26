@@ -17,6 +17,8 @@ object CinematecaColors {
     val OnBackground = Color.White
     val WatchlistSelectedSurface = Color(0xFF2A5ACC)
     val WatchlistSelectedOutline = Color(0xFF4D8EFF)
+    val ActionButtonSurface = Color(0xFF3A3A50)
+    val ActionButtonOutline = Color(0xFF55556A)
     val SecondaryText = Color.White.copy(alpha = 0.5f)
     val TertiaryText = Color.White.copy(alpha = 0.3f)
     val ButtonText = Color(0xFFC0C0D8)
