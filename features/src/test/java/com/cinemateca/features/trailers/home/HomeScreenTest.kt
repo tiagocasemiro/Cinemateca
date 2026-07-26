@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.cinemateca.features.designsystem.CinematecaTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -33,10 +34,60 @@ class HomeScreenTest {
         composeRule.onNodeWithText("Cinemateca").assertIsDisplayed()
         composeRule.onNodeWithText("Buscar filmes...").assertIsDisplayed()
         composeRule.onNodeWithText("Todos").assertIsDisplayed()
-        composeRule.onNodeWithText("1 filme").assertIsDisplayed()
+        composeRule.onNodeWithText("1 filmes").assertIsDisplayed()
         composeRule.onNodeWithText("Transformers: O Início").assertIsDisplayed()
         composeRule.onNodeWithText("Favoritar").assertIsDisplayed()
         composeRule.onNodeWithText("Quero Assistir").assertIsDisplayed()
+    }
+
+    @Test
+    fun `forwards search text changes from the movie input`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule
+            .onNodeWithContentDescription("Buscar filmes")
+            .performTextInput("Trans")
+
+        assertEquals(
+            listOf(HomeUiAction.SearchQueryChanged("Trans")),
+            actions,
+        )
+    }
+
+    @Test
+    fun `renders and forwards the Figma clear search action`() {
+        val actions = mutableListOf<HomeUiAction>()
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        searchQuery = "Tr",
+                        trailers = listOf(trailer()),
+                    ),
+                    onAction = actions::add,
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("Tr").assertIsDisplayed()
+        composeRule
+            .onNodeWithContentDescription("Limpar busca")
+            .performClick()
+
+        assertEquals(
+            listOf(HomeUiAction.SearchQueryChanged("")),
+            actions,
+        )
     }
 
     @Test

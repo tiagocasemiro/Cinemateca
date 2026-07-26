@@ -47,7 +47,12 @@ fun HomeScreen(
             .statusBarsPadding()
             .navigationBarsPadding(),
     ) {
-        HomeHeader()
+        HomeHeader(
+            searchQuery = uiState.searchQuery,
+            onSearchQueryChange = { query ->
+                onAction(HomeUiAction.SearchQueryChanged(query))
+            },
+        )
         HomeFilters(
             movieCount = uiState.trailers.size.takeUnless {
                 uiState.isOffline ||

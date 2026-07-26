@@ -48,6 +48,7 @@ class HomeViewModel(
             is HomeUiAction.SelectFilterOption -> selectFilterOption(
                 action.option,
             )
+            is HomeUiAction.SearchQueryChanged -> search(action.query)
         }
     }
 
@@ -58,6 +59,7 @@ class HomeViewModel(
                 trailers = loadedTrailers.toUiModels(
                     sortOption = option,
                     filterOption = it.filterOption,
+                    searchQuery = it.searchQuery,
                 ),
             )
         }
@@ -70,6 +72,20 @@ class HomeViewModel(
                 trailers = loadedTrailers.toUiModels(
                     sortOption = it.sortOption,
                     filterOption = option,
+                    searchQuery = it.searchQuery,
+                ),
+            )
+        }
+    }
+
+    private fun search(query: String) {
+        mutableUiState.update {
+            it.copy(
+                searchQuery = query,
+                trailers = loadedTrailers.toUiModels(
+                    sortOption = it.sortOption,
+                    filterOption = it.filterOption,
+                    searchQuery = query,
                 ),
             )
         }
@@ -132,6 +148,7 @@ class HomeViewModel(
                                 trailers = loadedTrailers.toUiModels(
                                     sortOption = it.sortOption,
                                     filterOption = it.filterOption,
+                                    searchQuery = it.searchQuery,
                                 ),
                             )
                         }
@@ -172,13 +189,18 @@ class HomeViewModel(
 private fun List<Trailer>.toUiModels(
     sortOption: HomeSortOption,
     filterOption: HomeFilterOption,
+    searchQuery: String,
 ): List<HomeTrailerItemUiModel> {
     val now = OffsetDateTime.now()
     val filteredTrailers = filter { trailer ->
-        trailer.matchesFilter(
-            filterOption = filterOption,
-            now = now,
-        )
+        trailer.title.contains(
+            other = searchQuery.trim(),
+            ignoreCase = true,
+        ) &&
+            trailer.matchesFilter(
+                filterOption = filterOption,
+                now = now,
+            )
     }
 
     val sortedTrailers = when (sortOption) {

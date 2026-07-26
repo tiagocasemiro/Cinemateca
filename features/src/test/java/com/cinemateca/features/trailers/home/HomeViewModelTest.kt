@@ -221,6 +221,50 @@ class HomeViewModelTest {
         }
 
     @Test
+    fun `filters loaded trailers by title as the search query changes`() =
+        runTest {
+            coEvery { getTrendingTrailersUseCase(any()) } returns Success(
+                trailerPage(
+                    trailers = listOf(
+                        trailer(
+                            id = "transformers",
+                            title = "Transformers: O Início",
+                        ),
+                        trailer(
+                            id = "deadpool",
+                            title = "Deadpool & Wolverine",
+                        ),
+                        trailer(
+                            id = "wicked",
+                            title = "Wicked",
+                        ),
+                    ),
+                ),
+            )
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            viewModel.onAction(HomeUiAction.SearchQueryChanged("WOL"))
+
+            assertEquals("WOL", viewModel.uiState.value.searchQuery)
+            assertEquals(
+                listOf("deadpool"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+
+            viewModel.onAction(HomeUiAction.SearchQueryChanged("   "))
+
+            assertEquals(
+                listOf("transformers", "deadpool", "wicked"),
+                viewModel.uiState.value.trailers.map {
+                    it.id
+                },
+            )
+        }
+
+    @Test
     fun `filters loaded trailers by the calculated movie release window`() =
         runTest {
             val now = OffsetDateTime.now()

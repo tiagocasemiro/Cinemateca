@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -42,6 +44,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +60,8 @@ private val PillShape = RoundedCornerShape(50)
 
 @Composable
 internal fun HomeHeader(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -109,10 +114,7 @@ internal fun HomeHeader(
             border = BorderStroke(1.dp, CinematecaColors.Outline),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(45.dp)
-                .semantics {
-                    contentDescription = "Buscar filmes"
-                },
+                .height(45.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -124,11 +126,51 @@ internal fun HomeHeader(
                     modifier = Modifier.size(15.dp),
                 )
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Buscar filmes...",
-                    color = CinematecaColors.TertiaryText,
-                    fontSize = 17.sp,
+                BasicTextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        color = CinematecaColors.OnBackground,
+                        fontSize = 17.sp,
+                        lineHeight = 24.sp,
+                    ),
+                    cursorBrush = SolidColor(CinematecaColors.Primary),
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics {
+                            contentDescription = "Buscar filmes"
+                        },
+                    decorationBox = { innerTextField ->
+                        Box(
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
+                            if (searchQuery.isEmpty()) {
+                                Text(
+                                    text = "Buscar filmes...",
+                                    color = CinematecaColors.TertiaryText,
+                                    fontSize = 17.sp,
+                                )
+                            }
+                            innerTextField()
+                        }
+                    },
                 )
+                if (searchQuery.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(10.dp))
+                    FigmaIcon(
+                        drawableResource = R.drawable.figma_close,
+                        contentDescription = "Limpar busca",
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable(
+                                role = Role.Button,
+                                onClick = {
+                                    onSearchQueryChange("")
+                                },
+                            ),
+                    )
+                }
             }
         }
     }
@@ -184,9 +226,7 @@ internal fun HomeFilters(
                 ),
         ) {
             Text(
-                text = movieCount?.let {
-                    "$it ${if (it == 1) "filme" else "filmes"}"
-                } ?: "—",
+                text = movieCount?.let { "$it filmes" } ?: "—",
                 color = CinematecaColors.TertiaryText,
                 fontSize = 11.sp,
                 lineHeight = 17.sp,

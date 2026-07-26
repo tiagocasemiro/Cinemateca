@@ -49,3 +49,7 @@ Ao clicar no botão mais recentes, Exiba um botom sheet como no layout https://w
 Ao clicar em um dos filtros "Todos", "Em Cartaz", "Lançamentos", "Em Breve", Selecione o botão clicado e aplique o filtro na listagem.
 
 Considerenado que um filme fique 3 semanas em cartas e que a data de lancamento do trailer acontece 1 mes antes do lancamento do filme. Atulaize os filtros "Todos", "Em Cartaz", "Lançamentos", "Em Breve" baseando se na data de publicação do trailer
+
+O campo de busca com placeholder "Buscar filmes..." deve ser construido com um input. Ao digitar cada letra no input a listagem deve ser filtrada pelo titulo do filme com o termo digitado.
+
+Confira o layout implementado com o layout projetado no figma url: https://www.figma.com/design/v6Ene6gKWwVDOKueK06OFN/Untitled?node-id=7-1092&t=h9eFD3oIOp74GJK6-4 . Se necessario faca os ajustes visuais.

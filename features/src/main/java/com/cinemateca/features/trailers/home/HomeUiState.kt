@@ -5,6 +5,7 @@ data class HomeUiState(
     val isOffline: Boolean = false,
     val sortOption: HomeSortOption = HomeSortOption.MostRecent,
     val filterOption: HomeFilterOption = HomeFilterOption.All,
+    val searchQuery: String = "",
     val trailers: List<HomeTrailerItemUiModel> = emptyList(),
     val errorMessage: String? = null,
 )

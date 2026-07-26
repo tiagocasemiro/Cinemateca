@@ -9,4 +9,7 @@ sealed interface HomeUiAction {
     data class SelectFilterOption(
         val option: HomeFilterOption,
     ) : HomeUiAction
+    data class SearchQueryChanged(
+        val query: String,
+    ) : HomeUiAction
 }
