@@ -36,7 +36,7 @@ organizar filmes em favoritos ou na lista “Quero Assistir”.
 
 |             Home              |               Detalhes               |
 |:-----------------------------:|:------------------------------------:|
-| ![Home](docs/images/home.png) | ![Detalhes](docs/images/details.png) |
+| <img src="docs/images/home.png" alt="Home" width="300" height="667" /> | <img src="docs/images/details.png" alt="Detalhes" width="300" height="667" /> |
 
 **Fluxo:** Home → Detalhes → YouTube ou navegador.
 
