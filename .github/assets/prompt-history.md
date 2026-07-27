@@ -514,3 +514,7 @@ Vamos ampliar a swite de testes para acesso remoto. Crie um interceptor no retro
 ---
 
 Rode todos os testes da aplicação
+
+---
+
+Ao abrir a tela de detalhes de qualquer trailer e em seguida clicar 2 vezes rapido no botão de voltar, o app fecha a tela de detalhes a tela da home e fica mostrando uma tela cinza completamente vazia. Corrija este bug de navegação

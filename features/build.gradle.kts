@@ -62,6 +62,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("org.robolectric:robolectric:4.13")
     testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.navigation:navigation-testing:2.8.0")
     testImplementation("androidx.compose.ui:ui-test-junit4")
     testImplementation("androidx.compose.ui:ui-test-manifest")
 }

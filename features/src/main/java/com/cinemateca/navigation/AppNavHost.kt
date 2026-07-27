@@ -51,9 +51,13 @@ fun AppNavHost(
         }
         composable<TrailerDetailsRoute> {
             TrailerDetailsDestination(
-                onNavigateBack = navController::popBackStack,
+                onNavigateBack = navController::navigateBackFromTrailerDetails,
                 testId = testId.childTestId("details"),
             )
         }
     }
+}
+
+internal fun NavHostController.navigateBackFromTrailerDetails() {
+    popBackStack<HomeRoute>(inclusive = false)
 }
