@@ -518,3 +518,7 @@ Rode todos os testes da aplicação
 ---
 
 Ao abrir a tela de detalhes de qualquer trailer e em seguida clicar 2 vezes rapido no botão de voltar, o app fecha a tela de detalhes a tela da home e fica mostrando uma tela cinza completamente vazia. Corrija este bug de navegação
+
+---
+
+Ao abrir o app, Enquanto o app carrega, é exibida uma tela com o icone daaplicação e um funso cinza. Mude o fundo cinza para     val Background = Color(0xFF0A0A0F) do CinematecaColors no theme
