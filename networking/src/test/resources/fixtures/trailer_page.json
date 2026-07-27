@@ -1,0 +1,36 @@
+{
+  "0": {
+    "id": "trailer-1",
+    "youtube_video_id": "youtube-1",
+    "youtube_channel_id": "channel-1",
+    "youtube_thumbnail": "https://img.youtube.com/1",
+    "title": "Trailer title",
+    "url": "https://kinocheck.com/trailer/1",
+    "thumbnail": "https://cdn.kinocheck.com/1.jpg",
+    "language": "en",
+    "categories": ["Trailer", "Clip"],
+    "genres": ["Action", "Drama"],
+    "published": "2026-07-25T10:00:00+02:00",
+    "views": 42,
+    "resource": {
+      "type": "movie",
+      "path": "/movies/",
+      "id": "ly4",
+      "imdb_id": "tt4154796",
+      "tmdb_id": 299534
+    }
+  },
+  "1": {
+    "id": "trailer-2",
+    "title": "Second trailer",
+    "categories": ["Trailer"],
+    "genres": ["Drama"],
+    "views": 7
+  },
+  "_metadata": {
+    "limit": 10,
+    "page": 2,
+    "total_pages": 4,
+    "total_count": 38
+  }
+}

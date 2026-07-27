@@ -506,3 +506,7 @@ class ExampleRepositoryTest {
 ---
 
 Converta o CinematecaDatabaseTest para usar database in memory
+
+---
+
+Vamos ampliar a swite de testes para acesso remoto. Crie um interceptor no retrofit, adicione como ultimo da pilha de interceptors. Sobrescreva o Retrofit original pelo modificado em uma nova classe de testes. Crie arquivos json e retorne a partir desse interceptor. O novo interceptor não pode deixar a requisição ser executada, para cada teste ele retornará um json. Antes de retornar o json este interceptor lancará uma excessão para cada elemente com estado inconsistente na requisição. Caso tudo esteja ok o interceptor devolverá o json ou um status de erro quando simular erro na api remota. Neste testes vamos testar consistencia da rquisição, serialização e desserialização e tratamento dos dados retornado ainda na camada networking.
