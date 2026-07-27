@@ -67,7 +67,7 @@ private val CardShape = RoundedCornerShape(14.dp)
 private val ActionShape = RoundedCornerShape(14.dp)
 
 @Composable
-fun TrailerDetailsBackground(
+internal fun TrailerDetailsBackground(
     imageUrl: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -98,7 +98,7 @@ fun TrailerDetailsBackground(
 }
 
 @Composable
-fun TrailerDetailsContent(
+internal fun TrailerDetailsContent(
     details: TrailerDetailsUiModel,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
@@ -675,7 +675,7 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-fun TrailerDetailsError(
+internal fun TrailerDetailsError(
     message: String,
     onBackClick: () -> Unit,
     onRetry: () -> Unit,
