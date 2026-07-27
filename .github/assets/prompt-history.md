@@ -470,3 +470,7 @@ $android-app-architecture Procure migre todas as strings em código para o arqui
 ---
 
 Nos botões de favorito o icone de coração fica preenchido quando selecionado. Deixe o icone dos botões de quero assistir também preenchidos quando selecionado
+
+---
+
+$android-app-architecture  Com base apenas na nossas definições de arquitetura. Crie testes arquiteturais usando konsist. Não olhe para o código, apenas crie os testes baseando se nas definições danossa skill

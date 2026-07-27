@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Cinemateca"
-include(":app", ":domain", ":features", ":local", ":networking")
+include(":app", ":architecture-tests", ":domain", ":features", ":local", ":networking")
