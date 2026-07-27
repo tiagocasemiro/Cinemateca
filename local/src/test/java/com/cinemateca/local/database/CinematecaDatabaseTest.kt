@@ -14,26 +14,26 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class CinematecaDatabaseTest {
-    private lateinit var context: Context
     private lateinit var database: CinematecaDatabase
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
-        context.deleteDatabase(TEST_DATABASE_NAME)
-        database = createDatabase()
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        database = Room.inMemoryDatabaseBuilder(
+            context,
+            CinematecaDatabase::class.java,
+        )
+            .allowMainThreadQueries()
+            .build()
     }
 
     @After
     fun tearDown() {
-        if (database.isOpen) {
-            database.close()
-        }
-        context.deleteDatabase(TEST_DATABASE_NAME)
+        database.close()
     }
 
     @Test
-    fun `preserves favorites and watchlist after database is reopened`() =
+    fun `keeps favorites and watchlist isolated in memory`() =
         runTest {
             database.favoriteMovieDao().insert(
                 FavoriteMovieEntity(movieId = "favorite"),
@@ -41,9 +41,6 @@ class CinematecaDatabaseTest {
             database.watchlistMovieDao().insert(
                 WatchlistMovieEntity(movieId = "watchlist"),
             )
-            database.close()
-
-            database = createDatabase()
 
             assertTrue(
                 database.favoriteMovieDao().contains("favorite"),
@@ -58,16 +55,4 @@ class CinematecaDatabaseTest {
                 database.watchlistMovieDao().contains("favorite"),
             )
         }
-
-    private fun createDatabase(): CinematecaDatabase {
-        return Room.databaseBuilder(
-            context,
-            CinematecaDatabase::class.java,
-            TEST_DATABASE_NAME,
-        ).build()
-    }
-
-    private companion object {
-        const val TEST_DATABASE_NAME = "cinemateca-test.db"
-    }
 }

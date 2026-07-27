@@ -474,3 +474,35 @@ Nos botões de favorito o icone de coração fica preenchido quando selecionado.
 ---
 
 $android-app-architecture  Com base apenas na nossas definições de arquitetura. Crie testes arquiteturais usando konsist. Não olhe para o código, apenas crie os testes baseando se nas definições danossa skill
+
+---
+
+Use confiogurações como as do exemplo abaixo para configurar testes de memoria e testar a integração com o room. Simule tabelas e verifique se as querys estão retornando o esperado. Teste insert e delete  em tabelas de memoria. teste amplamente a camada de integração com banco local.
+Exemplo de configuração:
+@RunWith(AndroidJUnit4::class)
+class ExampleRepositoryTest {
+
+    private lateinit var database: AppDatabase
+    private lateinit var dao: ExampleDao
+    private lateinit var repository: ExampleRepository
+
+    @Before
+    fun setup() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+
+        dao = database.exampleDao()
+        repository = ExampleRepository(dao)
+    }
+
+    @After
+    fun teardown() {
+        database.close()
+    }
+}
+
+---
+
+Converta o CinematecaDatabaseTest para usar database in memory
