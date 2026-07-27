@@ -43,7 +43,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +53,8 @@ import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.features.designsystem.asString
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 import com.cinemateca.features.trailers.home.HomeFilterOption
 import com.cinemateca.features.trailers.home.HomeTrailerItemUiModel
 
@@ -68,6 +69,7 @@ internal fun HomeHeader(
     watchlistCount: Int,
     onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val searchDescription = stringResource(R.string.search_movies)
     val clearSearchDescription = stringResource(R.string.clear_search)
@@ -80,7 +82,8 @@ internal fun HomeHeader(
                 top = 5.dp,
                 end = 19.dp,
                 bottom = 14.dp,
-            ),
+            )
+            .testId(testId),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -132,6 +135,7 @@ internal fun HomeHeader(
                             favoriteCount,
                             favoriteCount,
                         ),
+                        testId = testId.childTestId("favorite_count"),
                     )
                 }
                 if (watchlistCount > 0) {
@@ -144,6 +148,7 @@ internal fun HomeHeader(
                             watchlistCount,
                             watchlistCount,
                         ),
+                        testId = testId.childTestId("watchlist_count"),
                     )
                 }
             }
@@ -181,6 +186,7 @@ internal fun HomeHeader(
                     cursorBrush = SolidColor(CinematecaColors.Primary),
                     modifier = Modifier
                         .weight(1f)
+                        .testId(testId.childTestId("search"))
                         .semantics {
                             contentDescription = searchDescription
                         },
@@ -208,6 +214,7 @@ internal fun HomeHeader(
                         contentDescription = clearSearchDescription,
                         modifier = Modifier
                             .size(14.dp)
+                            .testId(testId.childTestId("clear_search"))
                             .clickable(
                                 role = Role.Button,
                                 onClick = {
@@ -228,6 +235,7 @@ private fun SelectionCountBadge(
     color: Color,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Surface(
         color = color.copy(alpha = 0.12f),
@@ -236,9 +244,11 @@ private fun SelectionCountBadge(
             width = 1.dp,
             color = color.copy(alpha = 0.2f),
         ),
-        modifier = modifier.semantics {
-            this.contentDescription = contentDescription
-        },
+        modifier = modifier
+            .testId(testId)
+            .semantics {
+                this.contentDescription = contentDescription
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -272,11 +282,13 @@ internal fun HomeFilters(
     onFilterClick: (HomeFilterOption) -> Unit,
     onSortClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(CinematecaColors.Background),
+            .background(CinematecaColors.Background)
+            .testId(testId),
     ) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -299,6 +311,9 @@ internal fun HomeFilters(
                     onClick = {
                         onFilterClick(option)
                     },
+                    testId = testId.childTestId(
+                        "filter.${option.name.lowercase()}",
+                    ),
                 )
             }
         }
@@ -334,6 +349,7 @@ internal fun HomeFilters(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
+                    .testId(testId.childTestId("sort"))
                     .clickable(
                         role = Role.Button,
                         onClick = onSortClick,
@@ -375,6 +391,7 @@ internal fun HomeFilters(
 @Composable
 internal fun HomeLoadingContent(
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val loadingDescription = stringResource(R.string.loading_movies)
 
@@ -387,13 +404,15 @@ internal fun HomeLoadingContent(
             .semantics {
                 contentDescription = loadingDescription
             }
-            .testTag("home_loading"),
+            .testId(testId),
     ) {
         items(
             count = 4,
             key = { index -> index },
-        ) {
-            SkeletonMovieCard()
+        ) { index ->
+            SkeletonMovieCard(
+                testId = testId.childTestId("movie.$index"),
+            )
         }
     }
 }
@@ -401,6 +420,7 @@ internal fun HomeLoadingContent(
 @Composable
 private fun SkeletonMovieCard(
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Surface(
         color = CinematecaColors.Surface,
@@ -412,6 +432,7 @@ private fun SkeletonMovieCard(
         modifier = modifier
             .fillMaxWidth()
             .height(164.dp)
+            .testId(testId)
             .graphicsLayer {
                 alpha = 0.71f
             },
@@ -437,12 +458,25 @@ private fun SkeletonMovieCard(
                 SkeletonLine(
                     widthFraction = 0.75f,
                     height = 19.dp,
+                    testId = testId.childTestId("line.0"),
                 )
-                SkeletonLine(widthFraction = 0.5f)
-                SkeletonLine(widthFraction = 0.67f)
+                SkeletonLine(
+                    widthFraction = 0.5f,
+                    testId = testId.childTestId("line.1"),
+                )
+                SkeletonLine(
+                    widthFraction = 0.67f,
+                    testId = testId.childTestId("line.2"),
+                )
                 Spacer(modifier = Modifier.height(0.75.dp))
-                SkeletonLine(widthFraction = 1f)
-                SkeletonLine(widthFraction = 0.8f)
+                SkeletonLine(
+                    widthFraction = 1f,
+                    testId = testId.childTestId("line.3"),
+                )
+                SkeletonLine(
+                    widthFraction = 0.8f,
+                    testId = testId.childTestId("line.4"),
+                )
             }
         }
     }
@@ -453,13 +487,15 @@ private fun SkeletonLine(
     widthFraction: Float,
     modifier: Modifier = Modifier,
     height: androidx.compose.ui.unit.Dp = 14.dp,
+    testId: String? = null,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth(widthFraction)
             .height(height)
             .clip(RoundedCornerShape(5.dp))
-            .background(Color.White.copy(alpha = 0.1f)),
+            .background(Color.White.copy(alpha = 0.1f))
+            .testId(testId),
     )
 }
 
@@ -469,6 +505,7 @@ private fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val chipDescription = stringResource(
         if (selected) {
@@ -496,6 +533,7 @@ private fun FilterChip(
         ),
         modifier = modifier
             .height(31.dp)
+            .testId(testId)
             .clickable(
                 role = Role.Button,
                 onClick = onClick,
@@ -503,6 +541,7 @@ private fun FilterChip(
             .semantics {
                 contentDescription = chipDescription
                 role = Role.Button
+                this.selected = selected
             },
     ) {
         Box(
@@ -535,6 +574,7 @@ internal fun HomeContent(
     onFavoriteClick: (String) -> Unit,
     onWatchClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -544,7 +584,9 @@ internal fun HomeContent(
             end = 14.dp,
             bottom = 38.dp,
         ),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testId(testId),
     ) {
         items(
             items = trailers,
@@ -565,6 +607,7 @@ internal fun HomeContent(
                 onWatchClick = {
                     onWatchClick(trailer.movieId)
                 },
+                testId = testId.childTestId("movie.${trailer.id}"),
             )
         }
     }
@@ -577,6 +620,7 @@ private fun MovieCard(
     onFavoriteClick: () -> Unit,
     onWatchClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val favoriteLabel = stringResource(R.string.action_favorite)
     val watchlistLabel = stringResource(R.string.action_watchlist)
@@ -588,7 +632,8 @@ private fun MovieCard(
         border = BorderStroke(1.dp, CinematecaColors.Outline),
         modifier = modifier
             .fillMaxWidth()
-            .height(197.dp),
+            .height(197.dp)
+            .testId(testId),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -635,11 +680,13 @@ private fun MovieCard(
                         drawableResource = R.drawable.figma_tag,
                         text = trailer.genres,
                         color = CinematecaColors.SecondaryText,
+                        testId = testId.childTestId("genres"),
                     )
                     MovieMetadata(
                         drawableResource = R.drawable.figma_calendar,
                         text = trailer.published,
                         color = Color.White.copy(alpha = 0.4f),
+                        testId = testId.childTestId("published"),
                     )
                 }
             }
@@ -660,6 +707,7 @@ private fun MovieCard(
                     selectedBorderColor = CinematecaColors.FavoriteSelectedOutline,
                     onClick = onFavoriteClick,
                     modifier = Modifier.weight(1f),
+                    testId = testId.childTestId("favorite"),
                 )
                 MovieActionButton(
                     text = watchlistLabel,
@@ -673,6 +721,7 @@ private fun MovieCard(
                     selectedBorderColor = CinematecaColors.WatchlistSelectedOutline,
                     onClick = onWatchClick,
                     modifier = Modifier.weight(1f),
+                    testId = testId.childTestId("watchlist"),
                 )
             }
         }
@@ -685,10 +734,13 @@ private fun MovieMetadata(
     text: UiText,
     color: Color,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .testId(testId),
     ) {
         FigmaIcon(
             drawableResource = drawableResource,
@@ -716,6 +768,7 @@ private fun MovieActionButton(
     selectedBorderColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val selectedDescription = stringResource(R.string.action_selected, text)
 
@@ -737,6 +790,7 @@ private fun MovieActionButton(
         ),
         modifier = modifier
             .height(36.dp)
+            .testId(testId)
             .semantics {
                 selected = isSelected
                 contentDescription = if (isSelected) {
@@ -778,11 +832,14 @@ internal fun HomeErrorContent(
     message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.padding(24.dp),
+        modifier = modifier
+            .padding(24.dp)
+            .testId(testId),
     ) {
         Text(
             text = message,
@@ -794,6 +851,7 @@ internal fun HomeErrorContent(
             colors = ButtonDefaults.buttonColors(
                 containerColor = CinematecaColors.Primary,
             ),
+            modifier = Modifier.testId(testId.childTestId("retry")),
         ) {
             Text(text = stringResource(R.string.action_retry))
         }
@@ -805,11 +863,12 @@ private fun FigmaIcon(
     drawableResource: Int,
     contentDescription: String?,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Image(
         painter = painterResource(drawableResource),
         contentDescription = contentDescription,
         contentScale = ContentScale.FillBounds,
-        modifier = modifier,
+        modifier = modifier.testId(testId),
     )
 }

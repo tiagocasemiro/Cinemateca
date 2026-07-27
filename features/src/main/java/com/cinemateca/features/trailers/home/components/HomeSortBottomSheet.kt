@@ -26,6 +26,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,7 @@ internal fun HomeSortBottomSheet(
     onOptionSelected: (HomeSortOption) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -70,7 +73,7 @@ internal fun HomeSortBottomSheet(
                     ),
             )
         },
-        modifier = modifier,
+        modifier = modifier.testId(testId),
     ) {
         Text(
             text = stringResource(R.string.sort_title),
@@ -90,6 +93,9 @@ internal fun HomeSortBottomSheet(
                 onClick = {
                     onOptionSelected(option)
                 },
+                testId = testId.childTestId(
+                    "option.${option.name.lowercase()}",
+                ),
             )
         }
 
@@ -107,6 +113,7 @@ private fun SortOptionRow(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val optionLabel = stringResource(option.labelResource)
     val optionDescription = if (isSelected) {
@@ -121,6 +128,7 @@ private fun SortOptionRow(
         modifier = modifier
             .fillMaxWidth()
             .height(57.dp)
+            .testId(testId)
             .clickable(
                 role = Role.RadioButton,
                 onClick = onClick,

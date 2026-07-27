@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 
 private val OfflineShape = RoundedCornerShape(50)
 
@@ -38,11 +40,16 @@ internal fun OfflineContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     centerContent: Boolean = false,
+    testId: String? = null,
     topContent: @Composable BoxScope.() -> Unit = {},
 ) {
     val offlineDescription = stringResource(R.string.offline_icon_description)
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxSize()
+            .testId(testId),
+    ) {
         val topPadding = if (maxHeight >= 360.dp) 76.dp else 0.dp
         val contentModifier = if (centerContent) {
             Modifier
@@ -75,6 +82,7 @@ internal fun OfflineContent(
                 shape = OfflineShape,
                 modifier = Modifier
                     .size(76.dp)
+                    .testId(testId.childTestId("icon"))
                     .semantics {
                         contentDescription = offlineDescription
                     },
@@ -114,7 +122,9 @@ internal fun OfflineContent(
                 onClick = onRetry,
                 color = CinematecaColors.Primary,
                 shape = OfflineShape,
-                modifier = Modifier.height(44.dp),
+                modifier = Modifier
+                    .height(44.dp)
+                    .testId(testId.childTestId("retry")),
             ) {
                 Box(
                     contentAlignment = Alignment.Center,

@@ -13,6 +13,7 @@ import org.koin.androidx.compose.koinViewModel
 fun TrailerDetailsDestination(
     onNavigateBack: () -> Unit,
     viewModel: TrailerDetailsViewModel = koinViewModel(),
+    testId: String? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -54,5 +55,6 @@ fun TrailerDetailsDestination(
                 ),
             )
         },
+        testId = testId,
     )
 }

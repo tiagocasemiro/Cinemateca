@@ -59,6 +59,8 @@ import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.features.designsystem.asString
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 import com.cinemateca.features.trailers.details.PromotionalVideoUiModel
 import com.cinemateca.features.trailers.details.TrailerDetailsUiModel
 
@@ -70,11 +72,13 @@ private val ActionShape = RoundedCornerShape(14.dp)
 internal fun TrailerDetailsBackground(
     imageUrl: String?,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(CinematecaColors.Background),
+            .background(CinematecaColors.Background)
+            .testId(testId),
     ) {
         AsyncImage(
             model = imageUrl,
@@ -107,17 +111,20 @@ internal fun TrailerDetailsContent(
     onYouTubeClick: () -> Unit,
     onPromotionalVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .navigationBarsPadding(),
+            .navigationBarsPadding()
+            .testId(testId),
     ) {
         TrailerHero(
             details = details,
             onBackClick = onBackClick,
             onShareClick = onShareClick,
+            testId = testId.childTestId("hero"),
         )
         Text(
             text = details.title,
@@ -136,6 +143,7 @@ internal fun TrailerDetailsContent(
             details = details,
             onFavoriteClick = onFavoriteClick,
             onWatchlistClick = onWatchlistClick,
+            testId = testId.childTestId("actions"),
         )
         HorizontalDivider(
             color = Color.White.copy(alpha = 0.07f),
@@ -145,6 +153,7 @@ internal fun TrailerDetailsContent(
             details = details,
             onYouTubeClick = onYouTubeClick,
             onPromotionalVideoClick = onPromotionalVideoClick,
+            testId = testId.childTestId("body"),
         )
     }
 }
@@ -154,11 +163,13 @@ private fun TrailerHero(
     details: TrailerDetailsUiModel,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    testId: String? = null,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp),
+            .height(250.dp)
+            .testId(testId),
     ) {
         AsyncImage(
             model = details.thumbnailUrl,
@@ -193,6 +204,7 @@ private fun TrailerHero(
                 contentDescription = stringResource(R.string.action_back),
                 onClick = onBackClick,
                 backgroundImageUrl = details.thumbnailUrl,
+                testId = testId.childTestId("back"),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -207,6 +219,7 @@ private fun TrailerHero(
                 ),
                 onClick = onShareClick,
                 backgroundImageUrl = details.thumbnailUrl,
+                testId = testId.childTestId("share"),
             ) {
                 Icon(
                     imageVector = Icons.Default.Share,
@@ -241,6 +254,7 @@ internal fun GlassIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundImageUrl: String? = null,
+    testId: String? = null,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -271,6 +285,7 @@ internal fun GlassIconButton(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
+                .testId(testId)
                 .clickable(
                     role = Role.Button,
                     onClick = onClick,
@@ -289,12 +304,14 @@ private fun ActionButtons(
     details: TrailerDetailsUiModel,
     onFavoriteClick: () -> Unit,
     onWatchlistClick: () -> Unit,
+    testId: String? = null,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = ContentPadding),
+            .padding(horizontal = ContentPadding)
+            .testId(testId),
     ) {
         DetailActionButton(
             text = stringResource(
@@ -314,6 +331,7 @@ private fun ActionButtons(
             selectedBorderColor = CinematecaColors.FavoriteSelectedOutline,
             onClick = onFavoriteClick,
             modifier = Modifier.weight(1f),
+            testId = testId.childTestId("favorite"),
         )
         DetailActionButton(
             text = stringResource(
@@ -333,6 +351,7 @@ private fun ActionButtons(
             selectedBorderColor = CinematecaColors.WatchlistSelectedOutline,
             onClick = onWatchlistClick,
             modifier = Modifier.weight(1f),
+            testId = testId.childTestId("watchlist"),
         )
     }
 }
@@ -346,6 +365,7 @@ private fun DetailActionButton(
     selectedBorderColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Surface(
         onClick = onClick,
@@ -365,6 +385,7 @@ private fun DetailActionButton(
         ),
         modifier = modifier
             .height(50.dp)
+            .testId(testId)
             .semantics {
                 selected = isSelected
             },
@@ -398,25 +419,36 @@ private fun DetailsBody(
     details: TrailerDetailsUiModel,
     onYouTubeClick: () -> Unit,
     onPromotionalVideoClick: (String) -> Unit,
+    testId: String? = null,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(19.dp),
-        modifier = Modifier.padding(
-            start = ContentPadding,
-            top = 19.dp,
-            end = ContentPadding,
-            bottom = 10.dp,
-        ),
+        modifier = Modifier
+            .padding(
+                start = ContentPadding,
+                top = 19.dp,
+                end = ContentPadding,
+                bottom = 10.dp,
+            )
+            .testId(testId),
     ) {
-        StatsRow(details)
-        TagsSection(tags = details.tags)
+        StatsRow(
+            details = details,
+            testId = testId.childTestId("stats"),
+        )
+        TagsSection(
+            tags = details.tags,
+            testId = testId.childTestId("tags"),
+        )
         TextSection(
             label = stringResource(R.string.details_description_label),
             text = details.description,
+            testId = testId.childTestId("description"),
         )
         PromotionalMaterials(
             videos = details.promotionalVideos,
             onVideoClick = onPromotionalVideoClick,
+            testId = testId.childTestId("promotional"),
         )
         Button(
             onClick = onYouTubeClick,
@@ -428,7 +460,8 @@ private fun DetailsBody(
             shape = RoundedCornerShape(19.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(57.dp),
+                .height(57.dp)
+                .testId(testId.childTestId("youtube")),
         ) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
@@ -448,25 +481,33 @@ private fun DetailsBody(
 }
 
 @Composable
-private fun StatsRow(details: TrailerDetailsUiModel) {
+private fun StatsRow(
+    details: TrailerDetailsUiModel,
+    testId: String? = null,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testId(testId),
     ) {
         StatCard(
             label = stringResource(R.string.details_views_label),
             value = details.views,
             modifier = Modifier.weight(1f),
+            testId = testId.childTestId("views"),
         )
         StatCard(
             label = stringResource(R.string.details_videos_label),
             value = details.videoCount,
             modifier = Modifier.weight(1f),
+            testId = testId.childTestId("videos"),
         )
         StatCard(
             label = stringResource(R.string.details_published_label),
             value = details.published,
             modifier = Modifier.weight(1f),
+            testId = testId.childTestId("published"),
         )
     }
 }
@@ -476,12 +517,15 @@ private fun StatCard(
     label: String,
     value: UiText,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Surface(
         color = Color(0xFF13131A).copy(alpha = 0.9f),
         shape = CardShape,
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f)),
-        modifier = modifier.height(96.dp),
+        modifier = modifier
+            .height(96.dp)
+            .testId(testId),
     ) {
         Column(
             modifier = Modifier.padding(15.dp),
@@ -509,9 +553,15 @@ private fun StatCard(
 }
 
 @Composable
-private fun TagsSection(tags: List<String>) {
-    Column {
-        SectionLabel(text = stringResource(R.string.details_tags_label))
+private fun TagsSection(
+    tags: List<String>,
+    testId: String? = null,
+) {
+    Column(modifier = Modifier.testId(testId)) {
+        SectionLabel(
+            text = stringResource(R.string.details_tags_label),
+            testId = testId.childTestId("label"),
+        )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(top = 9.dp),
@@ -526,6 +576,9 @@ private fun TagsSection(tags: List<String>) {
                     border = BorderStroke(
                         1.dp,
                         CinematecaColors.Primary.copy(alpha = 0.28f),
+                    ),
+                    modifier = Modifier.testId(
+                        testId.childTestId("tag.$tag"),
                     ),
                 ) {
                     Text(
@@ -548,9 +601,13 @@ private fun TagsSection(tags: List<String>) {
 private fun TextSection(
     label: String,
     text: UiText,
+    testId: String? = null,
 ) {
-    Column {
-        SectionLabel(text = label)
+    Column(modifier = Modifier.testId(testId)) {
+        SectionLabel(
+            text = label,
+            testId = testId.childTestId("label"),
+        )
         Text(
             text = text.asString(),
             color = Color.White.copy(alpha = 0.7f),
@@ -565,12 +622,14 @@ private fun TextSection(
 private fun PromotionalMaterials(
     videos: List<PromotionalVideoUiModel>,
     onVideoClick: (String) -> Unit,
+    testId: String? = null,
 ) {
-    Column {
+    Column(modifier = Modifier.testId(testId)) {
         SectionLabel(
             text = stringResource(
                 R.string.details_promotional_materials_label,
             ),
+            testId = testId.childTestId("label"),
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -582,6 +641,7 @@ private fun PromotionalMaterials(
                     onClick = {
                         video.youtubeVideoId?.let(onVideoClick)
                     },
+                    testId = testId.childTestId("video.${video.id}"),
                 )
             }
         }
@@ -592,6 +652,7 @@ private fun PromotionalMaterials(
 private fun PromotionalVideoCard(
     video: PromotionalVideoUiModel,
     onClick: () -> Unit,
+    testId: String? = null,
 ) {
     Surface(
         onClick = onClick,
@@ -601,7 +662,8 @@ private fun PromotionalVideoCard(
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.06f)),
         modifier = Modifier
             .fillMaxWidth()
-            .height(73.dp),
+            .height(73.dp)
+            .testId(testId),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -663,7 +725,10 @@ private fun PromotionalVideoCard(
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+private fun SectionLabel(
+    text: String,
+    testId: String? = null,
+) {
     Text(
         text = text,
         color = Color.White.copy(alpha = 0.4f),
@@ -671,6 +736,7 @@ private fun SectionLabel(text: String) {
         lineHeight = 15.sp,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = 1.sp,
+        modifier = Modifier.testId(testId),
     )
 }
 
@@ -680,11 +746,14 @@ internal fun TrailerDetailsError(
     onBackClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp),
-        modifier = modifier.padding(24.dp),
+        modifier = modifier
+            .padding(24.dp)
+            .testId(testId),
     ) {
         Text(
             text = message,
@@ -698,6 +767,7 @@ internal fun TrailerDetailsError(
                 onClick = onBackClick,
                 color = CinematecaColors.ButtonSurface,
                 shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.testId(testId.childTestId("back")),
             ) {
                 Text(
                     text = stringResource(R.string.action_back),
@@ -712,6 +782,7 @@ internal fun TrailerDetailsError(
                 onClick = onRetry,
                 color = CinematecaColors.Primary,
                 shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.testId(testId.childTestId("retry")),
             ) {
                 Text(
                     text = stringResource(R.string.action_retry),

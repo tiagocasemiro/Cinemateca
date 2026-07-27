@@ -13,6 +13,7 @@ fun HomeDestination(
         resourceType: String,
     ) -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
+    testId: String? = null,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -20,5 +21,6 @@ fun HomeDestination(
         uiState = uiState,
         onAction = viewModel::onAction,
         onTrailerClick = onTrailerClick,
+        testId = testId,
     )
 }

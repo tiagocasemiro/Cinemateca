@@ -23,7 +23,9 @@ import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
 import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.features.designsystem.asString
+import com.cinemateca.features.designsystem.childTestId
 import com.cinemateca.features.designsystem.components.OfflineContent
+import com.cinemateca.features.designsystem.testId
 import com.cinemateca.features.trailers.home.components.HomeContent
 import com.cinemateca.features.trailers.home.components.HomeErrorContent
 import com.cinemateca.features.trailers.home.components.HomeFilters
@@ -41,6 +43,7 @@ fun HomeScreen(
         movieId: String,
         resourceType: String,
     ) -> Unit = { _, _, _ -> },
+    testId: String? = null,
 ) {
     var isSortSheetVisible by rememberSaveable {
         mutableStateOf(false)
@@ -51,7 +54,8 @@ fun HomeScreen(
             .fillMaxSize()
             .background(CinematecaColors.Background)
             .statusBarsPadding()
-            .navigationBarsPadding(),
+            .navigationBarsPadding()
+            .testId(testId),
     ) {
         HomeHeader(
             searchQuery = uiState.searchQuery,
@@ -60,6 +64,7 @@ fun HomeScreen(
             onSearchQueryChange = { query ->
                 onAction(HomeUiAction.SearchQueryChanged(query))
             },
+            testId = testId.childTestId("header"),
         )
         HomeFilters(
             movieCount = uiState.trailers.size.takeUnless {
@@ -74,6 +79,7 @@ fun HomeScreen(
             onSortClick = {
                 isSortSheetVisible = true
             },
+            testId = testId.childTestId("filters"),
         )
 
         Box(
@@ -87,6 +93,7 @@ fun HomeScreen(
                     onRetry = {
                         onAction(HomeUiAction.Retry)
                     },
+                    testId = testId.childTestId("offline"),
                 )
 
                 uiState.trailers.isNotEmpty() -> HomeContent(
@@ -98,9 +105,12 @@ fun HomeScreen(
                     onWatchClick = { movieId ->
                         onAction(HomeUiAction.ToggleWatchlist(movieId))
                     },
+                    testId = testId.childTestId("content"),
                 )
 
-                uiState.isLoading -> HomeLoadingContent()
+                uiState.isLoading -> HomeLoadingContent(
+                    testId = testId.childTestId("loading"),
+                )
 
                 uiState.errorMessage != null -> HomeErrorContent(
                     message = uiState.errorMessage.asString(),
@@ -108,12 +118,15 @@ fun HomeScreen(
                         onAction(HomeUiAction.Retry)
                     },
                     modifier = Modifier.align(Alignment.Center),
+                    testId = testId.childTestId("error"),
                 )
 
                 else -> Text(
                     text = stringResource(R.string.home_empty_message),
                     color = Color.White.copy(alpha = 0.5f),
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testId(testId.childTestId("empty")),
                 )
             }
         }
@@ -129,6 +142,7 @@ fun HomeScreen(
             onDismiss = {
                 isSortSheetVisible = false
             },
+            testId = testId.childTestId("sort_sheet"),
         )
     }
 }

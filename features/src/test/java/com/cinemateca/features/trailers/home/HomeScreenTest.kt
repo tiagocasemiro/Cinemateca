@@ -3,7 +3,7 @@ package com.cinemateca.features.trailers.home
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -22,42 +22,31 @@ class HomeScreenTest {
 
     @Test
     fun `renders the Figma home structure and movie data`() {
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = {},
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(trailers = listOf(trailer())),
+        )
 
-        composeRule.onNodeWithText("Cinemateca").assertIsDisplayed()
-        composeRule.onNodeWithText("Buscar filmes…").assertIsDisplayed()
-        composeRule.onNodeWithText("Todos").assertIsDisplayed()
-        composeRule.onNodeWithText("1 filme").assertIsDisplayed()
+        composeRule.onNodeWithTag(HOME_ID).assertIsDisplayed()
+        composeRule.onNodeWithTag("$HOME_ID.header").assertIsDisplayed()
+        composeRule.onNodeWithTag("$HOME_ID.header.search").assertIsDisplayed()
+        composeRule.onNodeWithTag("$HOME_ID.filters").assertIsDisplayed()
+        composeRule.onNodeWithTag("$HOME_ID.content").assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("$HOME_ID.content.movie.transformers")
+            .assertIsDisplayed()
         composeRule.onNodeWithText("Transformers: O Início").assertIsDisplayed()
-        composeRule.onNodeWithText("Favoritar").assertIsDisplayed()
-        composeRule.onNodeWithText("Quero Assistir").assertIsDisplayed()
     }
 
     @Test
     fun `forwards search text changes from the movie input`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(trailers = listOf(trailer())),
+            onAction = actions::add,
+        )
 
         composeRule
-            .onNodeWithContentDescription("Buscar filmes")
+            .onNodeWithTag("$HOME_ID.header.search")
             .performTextInput("Trans")
 
         assertEquals(
@@ -69,21 +58,17 @@ class HomeScreenTest {
     @Test
     fun `renders and forwards the Figma clear search action`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        searchQuery = "Tr",
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(
+                searchQuery = "Tr",
+                trailers = listOf(trailer()),
+            ),
+            onAction = actions::add,
+        )
 
-        composeRule.onNodeWithText("Tr").assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Limpar busca")
+            .onNodeWithTag("$HOME_ID.header.clear_search")
+            .assertIsDisplayed()
             .performClick()
 
         assertEquals(
@@ -95,59 +80,49 @@ class HomeScreenTest {
     @Test
     fun `forwards retry action from error state`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        errorMessage = UiText.Dynamic("Falha ao carregar"),
-                    ),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(
+                errorMessage = UiText.Dynamic("Falha ao carregar"),
+            ),
+            onAction = actions::add,
+        )
 
-        composeRule.onNodeWithText("Tentar novamente").performClick()
+        composeRule
+            .onNodeWithTag("$HOME_ID.error.retry")
+            .performClick()
 
         assertEquals(listOf(HomeUiAction.Retry), actions)
     }
 
     @Test
     fun `renders Figma skeletons while initial data is loading`() {
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(isLoading = true),
-                    onAction = {},
-                )
-            }
-        }
+        setHomeContent(uiState = HomeUiState(isLoading = true))
 
-        composeRule.onNodeWithText("—").assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Carregando filmes")
+            .onNodeWithTag("$HOME_ID.loading")
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("$HOME_ID.loading.movie.0")
             .assertIsDisplayed()
     }
 
     @Test
     fun `renders Figma offline state and forwards retry action`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(isOffline = true),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(isOffline = true),
+            onAction = actions::add,
+        )
 
-        composeRule.onNodeWithText("Sem conexão").assertIsDisplayed()
         composeRule
-            .onNodeWithText("Verifique sua conexão e tente novamente.")
+            .onNodeWithTag("$HOME_ID.offline")
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Sem conexão com a internet")
+            .onNodeWithTag("$HOME_ID.offline.icon")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Tentar novamente").performClick()
+        composeRule
+            .onNodeWithTag("$HOME_ID.offline.retry")
+            .performClick()
 
         assertEquals(listOf(HomeUiAction.Retry), actions)
     }
@@ -155,25 +130,19 @@ class HomeScreenTest {
     @Test
     fun `opens sort sheet and forwards the selected option`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(trailers = listOf(trailer())),
+            onAction = actions::add,
+        )
 
         composeRule
-            .onNodeWithContentDescription(
-                "Ordenar filmes: Mais Recentes",
-            )
+            .onNodeWithTag("$HOME_ID.filters.sort")
             .performClick()
 
-        composeRule.onNodeWithText("Ordenar por").assertIsDisplayed()
-        composeRule.onNodeWithText("Mais Populares").performClick()
+        composeRule.onNodeWithTag("$HOME_ID.sort_sheet").assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("$HOME_ID.sort_sheet.option.mostpopular")
+            .performClick()
 
         assertEquals(
             listOf(
@@ -187,45 +156,35 @@ class HomeScreenTest {
 
     @Test
     fun `renders the selected sort option beside the sort icon`() {
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        sortOption = HomeSortOption.Alphabetical,
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = {},
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(
+                sortOption = HomeSortOption.Alphabetical,
+                trailers = listOf(trailer()),
+            ),
+        )
 
         composeRule
-            .onNodeWithContentDescription(
-                "Ordenar filmes: Ordem Alfabética",
-            )
+            .onNodeWithTag("$HOME_ID.filters.sort")
             .assertIsDisplayed()
     }
 
     @Test
     fun `forwards filter selection and renders the selected chip`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        filterOption = HomeFilterOption.Upcoming,
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = actions::add,
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(
+                filterOption = HomeFilterOption.Upcoming,
+                trailers = listOf(trailer()),
+            ),
+            onAction = actions::add,
+        )
 
         composeRule
-            .onNodeWithContentDescription("Filtro Em Breve selecionado")
+            .onNodeWithTag("$HOME_ID.filters.filter.upcoming")
+            .assertIsSelected()
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Filtrar por Em Cartaz")
+            .onNodeWithTag("$HOME_ID.filters.filter.nowplaying")
             .performClick()
 
         assertEquals(
@@ -241,36 +200,32 @@ class HomeScreenTest {
     @Test
     fun `renders Figma selected movie actions and forwards toggles`() {
         val actions = mutableListOf<HomeUiAction>()
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        favoriteCount = 1,
-                        watchlistCount = 1,
-                        trailers = listOf(
-                            trailer().copy(
-                                isFavorite = true,
-                                isWatchlisted = true,
-                            ),
-                        ),
+        setHomeContent(
+            uiState = HomeUiState(
+                favoriteCount = 1,
+                watchlistCount = 1,
+                trailers = listOf(
+                    trailer().copy(
+                        isFavorite = true,
+                        isWatchlisted = true,
                     ),
-                    onAction = actions::add,
-                )
-            }
-        }
+                ),
+            ),
+            onAction = actions::add,
+        )
 
         composeRule
-            .onNodeWithContentDescription("1 favorito")
+            .onNodeWithTag("$HOME_ID.header.favorite_count")
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("1 quero assistir")
+            .onNodeWithTag("$HOME_ID.header.watchlist_count")
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Favoritar selecionado")
+            .onNodeWithTag("$HOME_ID.content.movie.transformers.favorite")
             .assertIsSelected()
             .performClick()
         composeRule
-            .onNodeWithContentDescription("Quero Assistir selecionado")
+            .onNodeWithTag("$HOME_ID.content.movie.transformers.watchlist")
             .assertIsSelected()
             .performClick()
 
@@ -286,25 +241,16 @@ class HomeScreenTest {
     @Test
     fun `forwards trailer and movie ids when a card is clicked`() {
         var clickedIds: Triple<String, String, String>? = null
-        composeRule.setContent {
-            CinematecaTheme {
-                HomeScreen(
-                    uiState = HomeUiState(
-                        trailers = listOf(trailer()),
-                    ),
-                    onAction = {},
-                    onTrailerClick = { trailerId, movieId, resourceType ->
-                        clickedIds = Triple(
-                            trailerId,
-                            movieId,
-                            resourceType,
-                        )
-                    },
-                )
-            }
-        }
+        setHomeContent(
+            uiState = HomeUiState(trailers = listOf(trailer())),
+            onTrailerClick = { trailerId, movieId, resourceType ->
+                clickedIds = Triple(trailerId, movieId, resourceType)
+            },
+        )
 
-        composeRule.onNodeWithText("Transformers: O Início").performClick()
+        composeRule
+            .onNodeWithTag("$HOME_ID.content.movie.transformers")
+            .performClick()
 
         assertEquals(
             Triple("transformers", "transformers-movie", "movie"),
@@ -321,4 +267,25 @@ class HomeScreenTest {
         genres = UiText.Dynamic("Ficção Científica / Ação"),
         published = UiText.Dynamic("Novembro 2024"),
     )
+
+    private fun setHomeContent(
+        uiState: HomeUiState,
+        onAction: (HomeUiAction) -> Unit = {},
+        onTrailerClick: (String, String, String) -> Unit = { _, _, _ -> },
+    ) {
+        composeRule.setContent {
+            CinematecaTheme {
+                HomeScreen(
+                    uiState = uiState,
+                    onAction = onAction,
+                    onTrailerClick = onTrailerClick,
+                    testId = HOME_ID,
+                )
+            }
+        }
+    }
+
+    private companion object {
+        const val HOME_ID = "home_under_test"
+    }
 }

@@ -30,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cinemateca.features.R
 import com.cinemateca.features.designsystem.CinematecaColors
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 
 private val SkeletonColor = CinematecaColors.SurfaceElevated.copy(alpha = 0.53f)
 private val SkeletonBackground = Brush.linearGradient(
@@ -43,6 +45,7 @@ private val SkeletonBackground = Brush.linearGradient(
 internal fun TrailerDetailsLoading(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     val loadingDescription = stringResource(R.string.details_loading)
 
@@ -51,25 +54,33 @@ internal fun TrailerDetailsLoading(
             .fillMaxSize()
             .background(SkeletonBackground)
             .navigationBarsPadding()
+            .testId(testId)
             .semantics {
                 contentDescription = loadingDescription
             },
     ) {
-        LoadingHero(onBackClick = onBackClick)
-        LoadingTitle()
-        LoadingActions()
+        LoadingHero(
+            onBackClick = onBackClick,
+            testId = testId.childTestId("hero"),
+        )
+        LoadingTitle(testId = testId.childTestId("title"))
+        LoadingActions(testId = testId.childTestId("actions"))
         HorizontalDivider(color = CinematecaColors.Outline)
-        LoadingBody()
+        LoadingBody(testId = testId.childTestId("body"))
     }
 }
 
 @Composable
-private fun LoadingHero(onBackClick: () -> Unit) {
+private fun LoadingHero(
+    onBackClick: () -> Unit,
+    testId: String? = null,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
-            .background(SkeletonColor),
+            .background(SkeletonColor)
+            .testId(testId),
     ) {
         Box(
             modifier = Modifier
@@ -79,6 +90,7 @@ private fun LoadingHero(onBackClick: () -> Unit) {
             GlassIconButton(
                 contentDescription = stringResource(R.string.action_back),
                 onClick = onBackClick,
+                testId = testId.childTestId("back"),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -92,7 +104,9 @@ private fun LoadingHero(onBackClick: () -> Unit) {
 }
 
 @Composable
-private fun LoadingTitle() {
+private fun LoadingTitle(
+    testId: String? = null,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(9.5.dp),
         modifier = Modifier
@@ -102,25 +116,30 @@ private fun LoadingTitle() {
                 top = 19.dp,
                 end = 19.dp,
                 bottom = 9.5.dp,
-            ),
+            )
+            .testId(testId),
     ) {
         SkeletonBlock(
             modifier = Modifier
                 .width(255.dp)
                 .height(24.dp),
             shape = RoundedCornerShape(8.dp),
+            testId = testId.childTestId("line.0"),
         )
         SkeletonBlock(
             modifier = Modifier
                 .width(170.dp)
                 .height(19.dp),
             shape = RoundedCornerShape(8.dp),
+            testId = testId.childTestId("line.1"),
         )
     }
 }
 
 @Composable
-private fun LoadingActions() {
+private fun LoadingActions(
+    testId: String? = null,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         modifier = Modifier
@@ -130,74 +149,93 @@ private fun LoadingActions() {
                 top = 14.dp,
                 end = 19.dp,
                 bottom = 15.dp,
-            ),
+            )
+            .testId(testId),
     ) {
-        repeat(2) {
+        repeat(2) { index ->
             SkeletonBlock(
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp),
                 shape = RoundedCornerShape(14.dp),
+                testId = testId.childTestId("button.$index"),
             )
         }
     }
 }
 
 @Composable
-private fun LoadingBody() {
+private fun LoadingBody(
+    testId: String? = null,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(19.dp),
-        modifier = Modifier.padding(19.dp),
+        modifier = Modifier
+            .padding(19.dp)
+            .testId(testId),
     ) {
-        LoadingStats()
-        LoadingTags()
-        LoadingPromotionalMaterials()
+        LoadingStats(testId = testId.childTestId("stats"))
+        LoadingTags(testId = testId.childTestId("tags"))
+        LoadingPromotionalMaterials(
+            testId = testId.childTestId("promotional"),
+        )
         SkeletonBlock(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(57.dp),
             shape = RoundedCornerShape(19.dp),
+            testId = testId.childTestId("youtube"),
         )
     }
 }
 
 @Composable
-private fun LoadingStats() {
+private fun LoadingStats(
+    testId: String? = null,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testId(testId),
     ) {
-        repeat(3) {
+        repeat(3) { index ->
             SkeletonBlock(
                 modifier = Modifier
                     .weight(1f)
                     .height(76.dp),
                 shape = RoundedCornerShape(14.dp),
+                testId = testId.childTestId("card.$index"),
             )
         }
     }
 }
 
 @Composable
-private fun LoadingTags() {
+private fun LoadingTags(
+    testId: String? = null,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(9.5.dp),
+        modifier = Modifier.testId(testId),
     ) {
         SkeletonBlock(
             modifier = Modifier
                 .width(95.dp)
                 .height(14.dp),
             shape = RoundedCornerShape(5.dp),
+            testId = testId.childTestId("label"),
         )
         Row(
             horizontalArrangement = Arrangement.spacedBy(9.5.dp),
         ) {
-            listOf(80.dp, 64.dp, 72.dp, 56.dp).forEach { width ->
+            listOf(80.dp, 64.dp, 72.dp, 56.dp).forEachIndexed { index, width ->
                 SkeletonBlock(
                     modifier = Modifier
                         .width(width)
                         .height(29.dp),
                     shape = RoundedCornerShape(50),
+                    testId = testId.childTestId("tag.$index"),
                 )
             }
         }
@@ -205,24 +243,32 @@ private fun LoadingTags() {
 }
 
 @Composable
-private fun LoadingPromotionalMaterials() {
+private fun LoadingPromotionalMaterials(
+    testId: String? = null,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(9.5.dp),
+        modifier = Modifier.testId(testId),
     ) {
         SkeletonBlock(
             modifier = Modifier
                 .width(133.dp)
                 .height(14.dp),
             shape = RoundedCornerShape(5.dp),
+            testId = testId.childTestId("label"),
         )
-        repeat(3) {
-            LoadingPromotionalCard()
+        repeat(3) { index ->
+            LoadingPromotionalCard(
+                testId = testId.childTestId("card.$index"),
+            )
         }
     }
 }
 
 @Composable
-private fun LoadingPromotionalCard() {
+private fun LoadingPromotionalCard(
+    testId: String? = null,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -231,11 +277,13 @@ private fun LoadingPromotionalCard() {
                 color = CinematecaColors.Surface,
                 shape = RoundedCornerShape(14.dp),
             )
-            .padding(14.dp),
+            .padding(14.dp)
+            .testId(testId),
     ) {
         SkeletonBlock(
             modifier = Modifier.size(48.dp),
             shape = RoundedCornerShape(10.dp),
+            testId = testId.childTestId("thumbnail"),
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(
@@ -247,12 +295,14 @@ private fun LoadingPromotionalCard() {
                     .width(150.dp)
                     .height(17.dp),
                 shape = RoundedCornerShape(5.dp),
+                testId = testId.childTestId("line.0"),
             )
             SkeletonBlock(
                 modifier = Modifier
                     .width(87.dp)
                     .height(14.dp),
                 shape = RoundedCornerShape(5.dp),
+                testId = testId.childTestId("line.1"),
             )
         }
     }
@@ -262,11 +312,12 @@ private fun LoadingPromotionalCard() {
 private fun SkeletonBlock(
     modifier: Modifier,
     shape: Shape,
+    testId: String? = null,
 ) {
     Box(
         modifier = modifier.background(
             color = SkeletonColor,
             shape = shape,
-        ),
+        ).testId(testId),
     )
 }

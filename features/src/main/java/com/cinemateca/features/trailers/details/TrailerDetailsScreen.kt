@@ -22,7 +22,9 @@ import com.cinemateca.features.designsystem.CinematecaColors
 import com.cinemateca.features.designsystem.CinematecaTheme
 import com.cinemateca.features.designsystem.UiText
 import com.cinemateca.features.designsystem.asString
+import com.cinemateca.features.designsystem.childTestId
 import com.cinemateca.features.designsystem.components.OfflineContent
+import com.cinemateca.features.designsystem.testId
 import com.cinemateca.features.trailers.details.components.TrailerDetailsBackground
 import com.cinemateca.features.trailers.details.components.TrailerDetailsContent
 import com.cinemateca.features.trailers.details.components.TrailerDetailsError
@@ -38,14 +40,17 @@ fun TrailerDetailsScreen(
     onYouTubeClick: () -> Unit,
     onPromotionalVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(CinematecaColors.Background),
+            .background(CinematecaColors.Background)
+            .testId(testId),
     ) {
         TrailerDetailsBackground(
             imageUrl = uiState.details?.thumbnailUrl,
+            testId = testId.childTestId("background"),
         )
 
         when {
@@ -54,6 +59,7 @@ fun TrailerDetailsScreen(
                     onAction(TrailerDetailsUiAction.Retry)
                 },
                 centerContent = true,
+                testId = testId.childTestId("offline"),
             ) {
                 GlassIconButton(
                     contentDescription = stringResource(R.string.action_back),
@@ -62,6 +68,7 @@ fun TrailerDetailsScreen(
                         .align(Alignment.TopStart)
                         .statusBarsPadding()
                         .padding(start = 19.dp, top = 12.dp),
+                    testId = testId.childTestId("offline.back"),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -84,10 +91,12 @@ fun TrailerDetailsScreen(
                 },
                 onYouTubeClick = onYouTubeClick,
                 onPromotionalVideoClick = onPromotionalVideoClick,
+                testId = testId.childTestId("content"),
             )
 
             uiState.isLoading -> TrailerDetailsLoading(
                 onBackClick = onBackClick,
+                testId = testId.childTestId("loading"),
             )
 
             uiState.errorMessage != null -> TrailerDetailsError(
@@ -97,12 +106,15 @@ fun TrailerDetailsScreen(
                     onAction(TrailerDetailsUiAction.Retry)
                 },
                 modifier = Modifier.align(Alignment.Center),
+                testId = testId.childTestId("error"),
             )
 
             else -> Text(
                 text = stringResource(R.string.details_unavailable),
                 color = Color.White.copy(alpha = 0.6f),
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .testId(testId.childTestId("unavailable")),
             )
         }
     }

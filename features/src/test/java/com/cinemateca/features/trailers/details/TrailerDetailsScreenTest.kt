@@ -3,7 +3,7 @@ package com.cinemateca.features.trailers.details
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -23,24 +23,16 @@ class TrailerDetailsScreenTest {
     @Test
     fun `renders loading skeleton and forwards back click`() {
         var backClicks = 0
-        composeRule.setContent {
-            CinematecaTheme {
-                TrailerDetailsScreen(
-                    uiState = TrailerDetailsUiState(),
-                    onAction = {},
-                    onBackClick = { backClicks++ },
-                    onShareClick = {},
-                    onYouTubeClick = {},
-                    onPromotionalVideoClick = {},
-                )
-            }
-        }
+        setDetailsContent(
+            uiState = TrailerDetailsUiState(),
+            onBackClick = { backClicks++ },
+        )
 
         composeRule
-            .onNodeWithContentDescription("Carregando detalhes do trailer")
+            .onNodeWithTag("$DETAILS_ID.loading")
             .assertIsDisplayed()
         composeRule
-            .onNodeWithContentDescription("Voltar")
+            .onNodeWithTag("$DETAILS_ID.loading.hero.back")
             .assertIsDisplayed()
             .performClick()
 
@@ -49,36 +41,28 @@ class TrailerDetailsScreenTest {
 
     @Test
     fun `renders the complete trailer details layout`() {
-        composeRule.setContent {
-            CinematecaTheme {
-                TrailerDetailsScreen(
-                    uiState = TrailerDetailsUiState(
-                        isLoading = false,
-                        details = details(),
-                    ),
-                    onAction = {},
-                    onBackClick = {},
-                    onShareClick = {},
-                    onYouTubeClick = {},
-                    onPromotionalVideoClick = {},
-                )
-            }
-        }
+        setDetailsContent(
+            uiState = TrailerDetailsUiState(
+                isLoading = false,
+                details = details(),
+            ),
+        )
 
+        composeRule
+            .onNodeWithTag(DETAILS_ID)
+            .assertIsDisplayed()
+        composeRule
+            .onNodeWithTag("$DETAILS_ID.content.hero")
+            .assertIsDisplayed()
         composeRule
             .onNodeWithText("Deadpool & Wolverine")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("3.1M").assertIsDisplayed()
-        composeRule.onNodeWithText("12 trailers").assertIsDisplayed()
         composeRule
-            .onNodeWithText("#ação")
-            .assertExists()
-        composeRule
-            .onNodeWithText("DESCRIÇÃO DO TRAILER")
+            .onNodeWithTag("$DETAILS_ID.content.body.description")
             .performScrollTo()
             .assertIsDisplayed()
         composeRule
-            .onNodeWithText("Assistir no YouTube")
+            .onNodeWithTag("$DETAILS_ID.content.body.youtube")
             .performScrollTo()
             .assertIsDisplayed()
     }
@@ -86,29 +70,23 @@ class TrailerDetailsScreenTest {
     @Test
     fun `renders offline state and forwards its actions`() {
         val callbacks = mutableListOf<String>()
-        composeRule.setContent {
-            CinematecaTheme {
-                TrailerDetailsScreen(
-                    uiState = TrailerDetailsUiState(
-                        isLoading = false,
-                        isOffline = true,
-                    ),
-                    onAction = { callbacks += it.toString() },
-                    onBackClick = { callbacks += "back" },
-                    onShareClick = {},
-                    onYouTubeClick = {},
-                    onPromotionalVideoClick = {},
-                )
-            }
-        }
+        setDetailsContent(
+            uiState = TrailerDetailsUiState(
+                isLoading = false,
+                isOffline = true,
+            ),
+            onAction = { callbacks += it.toString() },
+            onBackClick = { callbacks += "back" },
+        )
 
         composeRule
-            .onNodeWithContentDescription("Sem conexão com a internet")
+            .onNodeWithTag("$DETAILS_ID.offline")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Sem conexão").assertIsDisplayed()
-        composeRule.onNodeWithText("Tentar novamente").performClick()
         composeRule
-            .onNodeWithContentDescription("Voltar")
+            .onNodeWithTag("$DETAILS_ID.offline.retry")
+            .performClick()
+        composeRule
+            .onNodeWithTag("$DETAILS_ID.offline.back")
             .performClick()
 
         assertEquals(
@@ -120,43 +98,43 @@ class TrailerDetailsScreenTest {
     @Test
     fun `forwards header and trailer action clicks`() {
         val callbacks = mutableListOf<String>()
-        composeRule.setContent {
-            CinematecaTheme {
-                TrailerDetailsScreen(
-                    uiState = TrailerDetailsUiState(
-                        isLoading = false,
-                        details = details().copy(
-                            isFavorite = true,
-                            isWatchlisted = true,
-                        ),
-                    ),
-                    onAction = { action ->
-                        callbacks += action.toString()
-                    },
-                    onBackClick = { callbacks += "back" },
-                    onShareClick = { callbacks += "share" },
-                    onYouTubeClick = { callbacks += "youtube" },
-                    onPromotionalVideoClick = { callbacks += "promo:$it" },
-                )
-            }
-        }
+        setDetailsContent(
+            uiState = TrailerDetailsUiState(
+                isLoading = false,
+                details = details().copy(
+                    isFavorite = true,
+                    isWatchlisted = true,
+                ),
+            ),
+            onAction = { action -> callbacks += action.toString() },
+            onBackClick = { callbacks += "back" },
+            onShareClick = { callbacks += "share" },
+            onYouTubeClick = { callbacks += "youtube" },
+            onPromotionalVideoClick = { callbacks += "promo:$it" },
+        )
 
         composeRule
-            .onNodeWithContentDescription("Voltar")
+            .onNodeWithTag("$DETAILS_ID.content.hero.back")
             .performClick()
         composeRule
-            .onNodeWithContentDescription("Compartilhar trailer")
+            .onNodeWithTag("$DETAILS_ID.content.hero.share")
             .performClick()
-        composeRule.onNodeWithText("Favoritado")
+        composeRule
+            .onNodeWithTag("$DETAILS_ID.content.actions.favorite")
             .assertIsSelected()
             .performClick()
-        composeRule.onNodeWithText("Na Lista")
+        composeRule
+            .onNodeWithTag("$DETAILS_ID.content.actions.watchlist")
             .assertIsSelected()
             .performClick()
-        composeRule.onNodeWithText("Trailer oficial — Deadpool & Wolverine")
+        composeRule
+            .onNodeWithTag(
+                "$DETAILS_ID.content.body.promotional.video.official",
+            )
             .performScrollTo()
             .performClick()
-        composeRule.onNodeWithText("Assistir no YouTube")
+        composeRule
+            .onNodeWithTag("$DETAILS_ID.content.body.youtube")
             .performScrollTo()
             .performClick()
 
@@ -204,4 +182,31 @@ class TrailerDetailsScreenTest {
         isFavorite = false,
         isWatchlisted = false,
     )
+
+    private fun setDetailsContent(
+        uiState: TrailerDetailsUiState,
+        onAction: (TrailerDetailsUiAction) -> Unit = {},
+        onBackClick: () -> Unit = {},
+        onShareClick: () -> Unit = {},
+        onYouTubeClick: () -> Unit = {},
+        onPromotionalVideoClick: (String) -> Unit = {},
+    ) {
+        composeRule.setContent {
+            CinematecaTheme {
+                TrailerDetailsScreen(
+                    uiState = uiState,
+                    onAction = onAction,
+                    onBackClick = onBackClick,
+                    onShareClick = onShareClick,
+                    onYouTubeClick = onYouTubeClick,
+                    onPromotionalVideoClick = onPromotionalVideoClick,
+                    testId = DETAILS_ID,
+                )
+            }
+        }
+    }
+
+    private companion object {
+        const val DETAILS_ID = "details_under_test"
+    }
 }

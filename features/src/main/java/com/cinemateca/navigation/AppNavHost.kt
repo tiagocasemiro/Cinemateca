@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.cinemateca.features.designsystem.childTestId
+import com.cinemateca.features.designsystem.testId
 import com.cinemateca.features.trailers.details.TrailerDetailsDestination
 import com.cinemateca.features.trailers.home.HomeDestination
 
@@ -13,10 +15,12 @@ import com.cinemateca.features.trailers.home.HomeDestination
 fun CinematecaApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    testId: String? = null,
 ) {
     AppNavHost(
         navController = navController,
         modifier = modifier,
+        testId = testId,
     )
 }
 
@@ -24,11 +28,12 @@ fun CinematecaApp(
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    testId: String? = null,
 ) {
     NavHost(
         navController = navController,
         startDestination = HomeRoute,
-        modifier = modifier,
+        modifier = modifier.testId(testId),
     ) {
         composable<HomeRoute> {
             HomeDestination(
@@ -41,11 +46,13 @@ fun AppNavHost(
                         ),
                     )
                 },
+                testId = testId.childTestId("home"),
             )
         }
         composable<TrailerDetailsRoute> {
             TrailerDetailsDestination(
                 onNavigateBack = navController::popBackStack,
+                testId = testId.childTestId("details"),
             )
         }
     }
